@@ -73,8 +73,14 @@ def create_app(api_url , api_key, name=None, short_name=None, description=None):
     name = u'Flickr Person PHinder' # Name with a typo
     short_name = u'flickrperson'
     description = u'Do you see a human in this photo?'
+    # JSON Blob to present the tasks for this app to the users
+    # First we read the template:
+    file = open('template.html')
+    text = file.read()
+    file.close()
+    info = dict (task_presenter = text)
     data = dict(name = name, short_name = short_name, description = description,
-               hidden = 0)
+               hidden = 0, info = info)
     data = json.dumps(data)
 
     # Checking which apps have been already registered in the DB

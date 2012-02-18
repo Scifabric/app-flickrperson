@@ -1,0 +1,139 @@
+<div class="row">
+  <!-- Success and Error Messages for the user --> 
+  <!-- Question, task id, photo and action buttons for answering the question-->
+  <div class="span8 offset3">
+    <div id="success" class="alert alert-success" style="display:none;">
+      <a class="close">×</a>
+      <strong>Well done!</strong> Your answer has been saved</strong>
+    </div>
+    <div id="finish" class="alert alert-success" style="display:none;">
+      <strong>Congratulations!</strong> All the tasks have been completed!</strong>
+      <br/>
+      <div class="alert-actions">
+              <a class="btn small" href="/">Go back</a>
+              <a class="btn small" href="/app">or, Check other applications</a>
+      </div>
+    </div>
+    <div id="error" class="alert alert-error" style="display:none;">
+      <a class="close">×</a>
+      <strong>Error!</strong> Something went wrong, please contact the site administrators</strong>
+    </div>
+  </div>
+
+  <div class="span8 offset3">
+    <div id="question">
+      <h1>Question</h1>
+      <p>Task: <span id="task-id" class="label label-warning">#</span></p>
+      <ul class="thumbnails">
+              <li><a id="photo-link" href="#" class="thumbnail"><img id="photo" src="#"></a></li>
+      </ul>
+    </div>
+    <div id="answer">
+      <button class="btn btn-success" onclick="submitTask('Yes')">Yes</button>
+      <button class="btn btn-info" onclick="submitTask('No')">No</button>
+      <button class="btn" onclick="getApp('flickrperson')">I don't know</button>
+    </div>
+
+  </div>
+</div>
+<script>
+// Gets the application name and gets all its tasks 
+function getApp(name) {
+    app_id = null;
+    $.getJSON('/api/app', function(apps) {
+            $.each(apps, function(){
+                if (this.short_name == name) {
+                    app_id = this.id;
+                    $("#question h1").text(this.description);
+                }
+            });
+            getTask(app_id);
+    });
+}
+
+// Get all the tasks for a given application. Selects one task randomly
+function getTask(app_id) {
+    previous_task_id = $("#task-id").text();
+    app_id_tasks = [];
+    $.getJSON('/api/task', function(all_tasks){
+        $.each(all_tasks, function(){
+            if ((this.app_id == app_id) & (this.state != "1")) {
+                app_id_tasks.push(this);    
+            }
+            });
+        if (app_id_tasks.length >= 1) {
+                $.each(app_id_tasks, function(){
+                    if (previous_task_id != "#"){
+                    app_id_tasks = jQuery.grep(app_id_tasks, function(value) {
+                            return value != previous_task_id;
+                            });
+                    }
+
+                    task = app_id_tasks[Math.floor(Math.random()*app_id_tasks.length)];
+
+                    if ((task.app_id == app_id) & (task.state == "0")) {
+                    $("#photo-link").attr("href", task.info.link);
+                    $("#photo").attr("src",task.info.url);
+                    $("#task-id").text(task.id);
+                    return false;
+                    }
+                    });
+        }
+        else {
+
+                $("#question").hide();
+                $("#answer").hide();
+                $("#finish").fadeIn();
+        }
+    });
+}
+
+// Saves the answer for the given task
+function submitTask(answer) {
+    task_id = $("#task-id").text();
+    url = '/api/task/' + task_id;
+    $.getJSON(url, function(task){
+            // Task completed
+            task.state = "1"
+            // Update the state of the task in the DB
+            $.ajax({
+                type: 'PUT',
+                dataType: 'json',
+                url: url, 
+                data: JSON.stringify(task),
+                contentType: 'application/json',
+                success: function() { 
+                        taskrun = {
+                        'created': task.create_time,
+                        'app_id': task.app_id,
+                        'task_id': task.id,
+                        'info': {'answer': answer }
+                        };
+
+                        // Convert it to a string
+                        taskrun = JSON.stringify(taskrun);
+
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'json',
+                            url: '/api/taskrun', 
+                            data: taskrun,
+                            contentType: 'application/json',
+                            success: function() { 
+                                        $("#success").fadeIn();
+                                        setTimeout(function() {
+                                            $("#success").fadeOut();
+                                            }, 1000);
+                                        getApp("flickrperson");
+                                     }
+                        });
+
+                         }
+            });
+
+
+    });
+}
+
+getApp("flickrperson");
+</script>
