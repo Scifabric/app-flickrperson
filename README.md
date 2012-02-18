@@ -12,3 +12,7 @@ Testing the application:
 *  Copy under your account your API-KEY
 *  Run python flickrperson.py -u http://pybossa.ep.io -k API-KEY
 *  Open with your browser flickrperson.html and see the tasks!
+
+Please, check the full documentation here:
+
+http://app-flickrperson.rtfd.org
