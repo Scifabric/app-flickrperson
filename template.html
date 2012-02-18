@@ -97,7 +97,7 @@ function submitTask(answer) {
             task.state = "1"
             // Update the state of the task in the DB
             $.ajax({
-                type: 'PUT',
+                type: 'GET',
                 dataType: 'json',
                 url: url, 
                 data: JSON.stringify(task),
