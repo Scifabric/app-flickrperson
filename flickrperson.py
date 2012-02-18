@@ -19,11 +19,9 @@
 import urllib2
 import json
 import datetime
+from optparse import OptionParser
 
-url_api = 'http://0.0.0.0:5000/api/'
-api_key = 'YOUR-KEY'
-
-def delete_app(id):
+def delete_app(api_url, api_key, id):
     """
     Deletes the Flickr Person Finder application.
 
@@ -31,7 +29,7 @@ def delete_app(id):
     :returns: True if the application has been deleted
     :rtype: boolean
     """
-    request = urllib2.Request(url_api + 'app/' + str(id) + '?api_key=' + api_key)
+    request = urllib2.Request(api_url + '/api/app/' + str(id) + '?api_key=' + api_key)
     request.get_method = lambda: 'DELETE'
 
     if (urllib2.urlopen(request).getcode() == 204): 
@@ -39,7 +37,7 @@ def delete_app(id):
     else:
         return False
 
-def update_app(id, name = None):
+def update_app(api_url , api_key, id, name = None):
     """
     Updates the name of the Flickr PErson Finder application
     
@@ -50,7 +48,7 @@ def update_app(id, name = None):
     """
     data = dict(id = id, name = name)
     data = json.dumps(data)
-    request = urllib2.Request(url_api + 'app/' + str(id) + '?api_key=' + api_key)
+    request = urllib2.Request(api_url + '/api/app/' + str(id) + '?api_key=' + api_key)
     request.add_data(data)
     request.add_header('Content-type', 'application/json')
     request.get_method = lambda: 'PUT'
@@ -60,7 +58,7 @@ def update_app(id, name = None):
     else:
         return False
 
-def create_app(name=None, short_name=None, description=None):
+def create_app(api_url , api_key, name=None, short_name=None, description=None):
     """
     Creates the Flickr Person Finder application. 
 
@@ -80,15 +78,15 @@ def create_app(name=None, short_name=None, description=None):
     data = json.dumps(data)
 
     # Checking which apps have been already registered in the DB
-    apps = json.loads(urllib2.urlopen(url_api + 'app' + '?api_key=' + api_key).read())
+    apps = json.loads(urllib2.urlopen(api_url + '/api/app' + '?api_key=' + api_key).read())
     for app in apps:
         if app['short_name'] == short_name: 
             print('{app_name} app is already registered in the DB'.format(app_name = name))
             print('Deleting it!')
-            if (delete_app(app['id'])): print "Application deleted!"
+            if (delete_app(api_url, api_key, app['id'])): print "Application deleted!"
     print("The application is not registered in PyBOSSA. Creating it...")
     # Setting the POST action
-    request = urllib2.Request(url_api + 'app?api_key=' + api_key )
+    request = urllib2.Request(api_url + '/api/app?api_key=' + api_key )
     request.add_data(data)
     request.add_header('Content-type', 'application/json')
 
@@ -98,7 +96,7 @@ def create_app(name=None, short_name=None, description=None):
         print("Done!")
         print("Ooooops! the name of the application has a typo!")
         print("Updating it!")
-        if (update_app(output['id'], "Flickr Person Finder")): 
+        if (update_app(api_url, api_key, output['id'], "Flickr Person Finder")): 
             print "Application name fixed!"
             return output['id']
         else:
@@ -107,7 +105,7 @@ def create_app(name=None, short_name=None, description=None):
         print("Error creating the application")
         return 0
 
-def create_task(app_id, photo):
+def create_task(api_url , api_key, app_id, photo):
     """
     Creates tasks for the application
 
@@ -121,7 +119,7 @@ def create_task(app_id, photo):
     data = json.dumps(data)
 
     # Setting the POST action
-    request = urllib2.Request(url_api + 'task' + '?api_key=' + api_key)
+    request = urllib2.Request(api_url + '/api/task' + '?api_key=' + api_key)
     request.add_data(data)
     request.add_header('Content-type', 'application/json')
 
@@ -160,11 +158,27 @@ def get_flickr_photos(size="big"):
 
 import sys
 if __name__ == "__main__":
-    if len(sys.argv) >= 2:
-        url_api = sys.argv[1]
-    print('Running against PyBosssa instance at: %s' % url_api)
+    # Arguments for the application
+    usage = "usage: %prog [options]"
+    parser = OptionParser(usage)
+    
+    parser.add_option("-u", "--url", dest="api_url", help="PyBossa URL http://domain.com/", metavar="URL")
+    parser.add_option("-k", "--api-key", dest="api_key", help="PyBossa User API-KEY to interact with PyBossa", metavar="API-KEY")
+    parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
+    
+    (options, args) = parser.parse_args()
 
-    app_id = create_app()
+    if not options.api_url:
+        options.api_url = 'http://localhost:5000/'
+
+    if not options.api_key:
+        parser.error("You must supply an API-KEY to create an applicationa and tasks in PyBossa")
+
+    if (options.verbose):
+       print('Running against PyBosssa instance at: %s' % options.api_url)
+       print('Using API-KEY: %s' % options.api_key)
+
+    app_id = create_app(options.api_url, options.api_key)
     # First of all we get the URL photos
     # WARNING: Sometimes the flickr feed returns a wrong escape character, so it may
     # fail at this step
@@ -172,5 +186,5 @@ if __name__ == "__main__":
     # Finally, we have to create a set of tasks for the application
     # For this, we get first the photo URLs from Flickr
     for photo in photos:
-        create_task(app_id, photo)
+        create_task(options.api_url, options.api_key, app_id, photo)
 

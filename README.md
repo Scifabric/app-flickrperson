@@ -9,7 +9,6 @@ This application has three files:
 Testing the application:
 
 1.- Create an account in PyBossa
-2.- Copy and paste the API_KEY into flickrperson.py
-3.- Run python flickrperson.py
-4.- Copy flickrperson.html and the js folder into PyBossa static folder
-5.- Open http://domain/pybossa/static/flickrperson.html
+2.- Copy under your account your API-KEY
+3.- Run python flickrperson.py -k http://pybossa.ep.io -k API-KEY
+4.- Open with your browser flickrperson.html and see the tasks!
