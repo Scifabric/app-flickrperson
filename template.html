@@ -51,36 +51,17 @@ function getApp(name) {
     });
 }
 
-// Get all the tasks for a given application. Selects one task randomly
+// Uses the new API method to get a proper task to be shown!
 function getTask(app_id) {
     previous_task_id = $("#task-id").text();
-    app_id_tasks = [];
-    $.getJSON('/api/task', function(all_tasks){
-        $.each(all_tasks, function(){
-            if ((this.app_id == app_id) & (this.state != "1")) {
-                app_id_tasks.push(this);    
-            }
-            });
-        if (app_id_tasks.length >= 1) {
-                $.each(app_id_tasks, function(){
-                    if (previous_task_id != "#"){
-                    app_id_tasks = jQuery.grep(app_id_tasks, function(value) {
-                            return value != previous_task_id;
-                            });
-                    }
-
-                    task = app_id_tasks[Math.floor(Math.random()*app_id_tasks.length)];
-
-                    if ((task.app_id == app_id) & (task.state == "0")) {
-                    $("#photo-link").attr("href", task.info.link);
-                    $("#photo").attr("src",task.info.url);
-                    $("#task-id").text(task.id);
-                    return false;
-                    }
-                    });
+    url = '/api/app/'.concat(app_id,'/newtask');
+    $.getJSON(url, function(task){
+        if ((task.app_id == app_id) & (task.state != "1")) {
+                $("#photo-link").attr("href", task.info.link);
+                $("#photo").attr("src",task.info.url);
+                $("#task-id").text(task.id);
         }
         else {
-
                 $("#question").hide();
                 $("#answer").hide();
                 $("#finish").fadeIn();
