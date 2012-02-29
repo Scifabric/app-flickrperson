@@ -9,7 +9,9 @@ etc).
 
 FlickrPerson is a demo application that asks volunteers to answer a simple question: do you see a human in this photo?
 
-FlickrPerson grabs the latest 20 photos published in Flickr public RSS feed, and adds them as tasks into PyBossa. Then the photos are shown to the users and they can answer: yes, no or I don't know (sometimes is even too complicated for humans).
+FlickrPerson grabs the latest 20 photos published in Flickr public RSS feed, and adds them as tasks into PyBossa. 
+
+Then the photos are shown to the users and they can answer: yes, no or I don't know (sometimes is even too complicated for humans), saving the answer in the DB.
 
 User Guide
 ==========
@@ -31,16 +33,10 @@ Useful Links
 * User stories: http://science.okfnpad.org/pybossa-userstories
 * General etherpad: http://science.okfnpad.org/pybossa
 
-Quickstart
-----------
-
 .. toctree::
    :maxdepth: 2
    
    quickstart
-
-Understanding FlickrPerson
-----------
 
 .. toctree::
    :maxdepth: 2

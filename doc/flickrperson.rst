@@ -8,8 +8,8 @@ classify photographs by viewing a photograph and then answering a question.
 
 The demo application Flickr Person has two main components:
 
-  * Task Creator: Python script to generate the tasks in PyBossa
-  * Task Presenter: HTML + Javascript to show the tasks to the users.
+  * **Task Creator**: Python script to generate the tasks in PyBossa
+  * **Task Presenter**: HTML + Javascript to show the tasks to the users.
 
 Both applications employ the PyBossa API.
 
@@ -20,7 +20,7 @@ You will need to set create an account in a PyBossa instance, to get an API-KEY.
 
 .. note:
 
-   You can use http://pybossa.ep.io for testing. 
+   You can use http://pybossa.com for testing. 
 
 Creating the tasks themselves will be done by
 the Flickr Person task creator script (see next step).
@@ -33,14 +33,14 @@ We now need to load tasks for your application into PyBossa.
 
 Run the following script::
 
-  python examples/flickrperson.py -u http://pybossadomain.com -k API-KEY
+  python flickrperson.py -u http://pybossadomain.com -k API-KEY
 
 This script will grab the latest published photos in the Flickr public feed and
 save the *link* of the image (the Flickr web page) and the *url* of the image.
 For example:
 
-  * Link: http://www.flickr.com/photos/teleyinex/2945647308/
-  * URL: http://farm4.staticflickr.com/3208/2945647308_f048cc1633_m.jpg
+  * **Link**: http://www.flickr.com/photos/teleyinex/2945647308/
+  * **URL**: http://farm4.staticflickr.com/3208/2945647308_f048cc1633_m.jpg
 
 Those items will be converted into the following JSON object::
 
@@ -65,8 +65,8 @@ Presenting the Tasks to the user
 In order to present the tasks to the user, you will only need an HTML template
 within PyBossa and a Javascript or any other script language that you want to
 use. In this case, Flickr Person uses a basic HTML skeleton and a simple
-Javascript library (based on jQuery) to present the tasks to the users (only
-anonymous users for the moment) and save the answers.
+Javascript library (based on jQuery) to present the tasks to the users and save the answers 
+(if a user has signed in, his userid will be saved with the answer).
 
 1. The HTML Skeleton
 --------------------
@@ -74,28 +74,33 @@ anonymous users for the moment) and save the answers.
 Check the file_ **flickrperson.html** for a very basic
 skeleton to show the tasks. The file has three sections (div ones):
 
-  * <divs> for the warnings actions. When the user saves an answer, a success
+  * **<divs>** for the warnings actions. When the user saves an answer, a success
     feedback message is shown to the user. There is also an error one for
     failures.
-  * <divs> for the Flickr image. This div will be updated via the Javascript
+  * **<divs>** for the Flickr image. This div will be updated via the Javascript
     with the Flickr Link and image URL for every task.
-  * <divs> for the answer buttons. There are three buttons with the possible
-    answers: Yes, No, I don't know.
+  * **<divs>** for the answer buttons. There are three buttons with the possible
+    answers: *Yes*, *No*, *I don't know*.
 
 At the end of the skeleton we load the Javascript.
 
-.. _file: https://github.com/PyBossa/app-flickrperson/blob/master/app-flickrperson/flickrperson.html
+.. _file: https://github.com/PyBossa/app-flickrperson/blob/master/app-flickrperson/template.html
+
+This template file will be used by the **flickrperson.py** script to send the
+template as part of the JSON object that will create the tasks. Therefore, it
+will be possible to create several tasks with different views, allowing to test
+different approaches for the same data.
 
 2. Present the task to the user
 -------------------------------
 
 All the action takes place in the file_
-**/js/flickrperson.js**. The script has several functions to
+**template.html** script section. The script has several functions to
 get from PyBossa the application and its associated tasks. In all
 the cases, the calls are using the RESTful API of PyBossa.
 
-First of all we need to get the application ID, so we can check which tasks
-are available for the users. The function getApp(name) will get all the
+First of all we need to get the application ID, so we can request a new tas for
+that application and present it to the users. The function getApp(name) will get all the
 registered applications in PyBossa and get the ID for Flickr Person. In this case, *name*
 will have the value "FlickrPerson".
 
@@ -105,31 +110,34 @@ will have the value "FlickrPerson".
 
 In this case we use the short name or slug to identify for which application we
 want the tasks. If the application is in the system, the function will call the
-method **getTask** to obtain all the available tasks for the application.
+method **getTask** to obtain a new task to present for the users.
 
 .. js:function:: getTask(app_id)
 
    :param integer app_id: Application ID
 
-getTask will obtain all the available tasks in the system (as in the previous
-step, for the moment it is not possible to get the task for a given app
-ID via the API) and selects those ones that belong to the application. Then, it
-choses one randomly and fills in the HTML skeleton with the available
+getTask uses the API call **/api/app/<id>/newtask** to request a new task for
+the given application ID. PyBossa for the moment picks tasks randomly, but in
+the future this will be improved.
+
+Then the new task is used to fill in the HTML skeleton with the available
 information of the task:
 
   * the Task ID
+  * the Image URL
+  * the question
 
 
 3. Saving the answer
 --------------------
 
 Once the task has been presented, the users can click the answer buttons: **Yes**, **No** or **I don't know**.
-Yes and No save the answer in the DB (check **/api/taskrun**) with information about the task and the answer,
-while the button **I don't know** simply loads another task as sometimes the
+*Yes* and *No* save the answer in the DB (check **/api/taskrun**) with information about the task and the answer,
+while the button *I don't know* simply loads another task as sometimes the
 image is not available (the Flickr user has delete it) or it is not clear if
 there is a human or not in the image (you only see one hand and nothing else). 
 
-flickrperson.js uses the function submitTask(answer) to stores the answer:
+The JS in the file *template.js* uses the function **submitTask(answer)** to stores the answer:
 
 .. js:function:: submitTask(answer)
 
@@ -139,13 +147,18 @@ The function gets the answer from the button and embeds it in the *info* field o
 
   'info': {'answer': answer}
 
-Please, read the `example file
-<https://github.com/PyBossa/app-flickrperson/blob/master/app-flickrperson/flickrperson.html>`_
+Please, read the `template file
+<https://github.com/PyBossa/app-flickrperson/blob/master/app-flickrperson/template.html>`_
 for more details about all the steps.
 
 
 4. Test the task presenter
 --------------------------
 
-In order to test the task presenter, you only have to load the flickrperson.html file in your browser.
+As the script **flickrperson.py** has created all the tasks with an associated
+presenter: the **template.html** file, the user only has to click in the
+Applications menu to see all the available applications and load the presenter
+for one of the registered applications in PyBossa. This will load the HTML
+structure for the application, as well as the JS to get a new task and present
+it to the user.
 

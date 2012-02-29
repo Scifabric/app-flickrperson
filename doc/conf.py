@@ -40,8 +40,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'PyBossa'
-copyright = u'2011, Citizen Cyberscience Centre and Open Knowledge Foundation'
+project = u'FlickrPerson demo application for PyBossa'
+copyright = u'2012, Citizen Cyberscience Centre and Open Knowledge Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -183,7 +183,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'PyBossa.tex', u'PyBossa Documentation',
+  ('index', 'FlickrPerson.tex', u'FlickrPerson demo application for PyBossa Documentation',
    u'Citizen Cyberscience Centre and Open Knowledge Foundation', 'manual'),
 ]
 
@@ -213,7 +213,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pybossa', u'PyBossa Documentation',
+    ('index', 'flickrperson', u'FlickrPerson demo application for PyBossa Documentation',
      [u'Citizen Cyberscience Centre and Open Knowledge Foundation'], 1)
 ]
 
@@ -227,7 +227,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'PyBossa', u'PyBossa Documentation',
+  ('index', 'flickrperson', u'FlickrPerson demo application for PyBossa Documentation',
    u'Citizen Cyberscience Centre and Open Knowledge Foundation', 'PyBossa', 'One line description of project.',
    'Miscellaneous'),
 ]
