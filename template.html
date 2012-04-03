@@ -31,90 +31,38 @@
     <div id="answer">
       <button class="btn btn-success" onclick="submitTask('Yes')">Yes</button>
       <button class="btn btn-info" onclick="submitTask('No')">No</button>
-      <button class="btn" onclick="getApp('flickrperson')">I don't know</button>
+      <button class="btn" onclick="pybossa.newTask('flickrperson').done( function( data ) { loadData( data ) });">I don't know</button>
     </div>
-
   </div>
 </div>
+<script src="/static/js/pybossa/pybossa.js" type="text/javascript"></script>
 <script>
-// Gets the application name and gets all its tasks 
-function getApp(name) {
-    app_id = null;
-    $.getJSON('/api/app', function(apps) {
-            $.each(apps, function(){
-                if (this.short_name == name) {
-                    app_id = this.id;
-                    $("#question h1").text(this.description);
-                }
-            });
-            getTask(app_id);
-    });
+
+// Function to load the TaskRun data into the HTML skeleton
+function loadData( data ) {
+    // Uncomment next line for debugging purposes
+    //console.log( data );
+    $("#question h1").text(data.question);
+    $("#task-id").text(data.task.id);
+    $("#photo-link").attr("href", data.task.info.link);
+    $("#photo").attr("src",data.task.info.url);
 }
 
-// Uses the new API method to get a proper task to be shown!
-function getTask(app_id) {
-    previous_task_id = $("#task-id").text();
-    url = '/api/app/'.concat(app_id,'/newtask');
-    $.getJSON(url, function(task){
-        if ((task.app_id == app_id) & (task.state != "1")) {
-                $("#photo-link").attr("href", task.info.link);
-                $("#photo").attr("src",task.info.url);
-                $("#task-id").text(task.id);
-        }
-        else {
-                $("#question").hide();
-                $("#answer").hide();
-                $("#finish").fadeIn();
-        }
-    });
-}
-
-// Saves the answer for the given task
+// Function to submit and save the TaskRun in PyBossa
 function submitTask(answer) {
-    task_id = $("#task-id").text();
-    url = '/api/task/' + task_id;
-    $.getJSON(url, function(task){
-            // Task completed
-            task.state = "1"
-            // Update the state of the task in the DB
-            $.ajax({
-                type: 'GET',
-                dataType: 'json',
-                url: url, 
-                data: JSON.stringify(task),
-                contentType: 'application/json',
-                success: function() { 
-                        taskrun = {
-                        'created': task.create_time,
-                        'app_id': task.app_id,
-                        'task_id': task.id,
-                        'info': {'answer': answer }
-                        };
-
-                        // Convert it to a string
-                        taskrun = JSON.stringify(taskrun);
-
-                        $.ajax({
-                            type: 'POST',
-                            dataType: 'json',
-                            url: '/api/taskrun', 
-                            data: taskrun,
-                            contentType: 'application/json',
-                            success: function() { 
-                                        $("#success").fadeIn();
-                                        setTimeout(function() {
-                                            $("#success").fadeOut();
-                                            }, 1000);
-                                        getApp("flickrperson");
-                                     }
-                        });
-
-                         }
-            });
-
-
+    // Get the task-id
+    var taskid = $("#task-id").text();
+    // Save the task
+    pybossa.saveTask(taskid, answer).done( function( data ) {
+        // Uncoment next line for debugging purposes
+        //console.log("Answer saved!");
+        // FadeIn & Out the success div feedback
+        $("#success").fadeIn();
+        setTimeout(function() { $("#success").fadeOut() }, 1000);
+        // Load a new task
+        pybossa.newTask("flickrperson").done( function( data ){ loadData( data ) });
     });
 }
 
-getApp("flickrperson");
+pybossa.newTask("flickrperson").done( function( data ) { loadData( data ) });
 </script>
