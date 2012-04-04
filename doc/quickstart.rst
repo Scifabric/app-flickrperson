@@ -13,7 +13,7 @@ Quickstart
 2. Then, you will only have to access the folder that will have two files:
 
   * **template.html** This is the view for your application, what the volunteer will see and interact with. This file includes the HTML structure plus the JavaScript that will interact with the PyBossa API to request new tasks and save the answers from the users.
-  * **flickperson.py** This is the script that will allow you to create the application in PyBossa and several tasks for the user.
+  * **createTasks.py** This is the script that will allow you to create the application in PyBossa and several tasks for the user.
      
 3. Create an account in http://pybossa.com (check the Register option!).
 4. Check your profile, your user name in blue in the top bar, to get your **API-KEY**.
