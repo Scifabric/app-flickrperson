@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Flickr Person Finder Results page">
+    
+        <title>Results for Flickr Person Finder</title>
+    <!-- Le styles -->
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Le javascript-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v2.js"></script>
+    </head>
+    <body>
+        <div class="container" style="padding-top: 20px">
+            <div class="row">
+                <div class="span10 offset1 well" style="text-align:center">
+                    <h2>Distribution of votes for <small>Flickr Person Finder</small></h2>
+                </div>
+            </div>
+            <div class="row">
+                <div id="arcs" class="span7 offset2"></div>
+                <div class="span3" style="text-align:center">
+                    <button class="btn btn-large btn-success"  onclick="create_arcs_for()">
+                        Check task &raquo;
+                    </button>
+                    <input class="span1" type="text" style="height:22px" name="taskId" id="taskId"/>
+                    <h3>Or</h3>
+                    <button id="next" class="btn btn-large btn-primary" onclick="create_arcs()">
+                    Check task
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div id="img" class="span8 offset2" style="margin-top:-120px; text-align:center;">
+                    <ul class="thumbnails">
+                        <li class="span6">
+                            <img id="flickr" src="#" class="thumbnail">
+                        </li>
+                </div>
+            </div>
+            <div class="row">
+                <div class="span8 offset2">
+                </div>
+            </div>
+        </div>
+    <!-- Le results -->
+    <script src="results.js"></script>
+    </body>
+</html>
