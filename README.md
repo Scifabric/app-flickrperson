@@ -15,3 +15,7 @@ Testing the application:
 Please, check the full documentation here:
 
 http://app-flickrperson.rtfd.org
+
+The thumbnail has been created using a photo from Sean McGrath (license CC
+BY 2.0). 
+Check the original photo here: http://www.flickr.com/photos/mcgraths/3289448299/
