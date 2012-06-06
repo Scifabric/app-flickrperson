@@ -1,7 +1,18 @@
+<style type="text/css">
+    #throbber {
+        position:absolute;
+        z-index: 10000;
+        width: 100px;
+        height: 100px;
+        margin-top: 200px;
+        margin-left: 300px;
+    }
+</style>
+
 <div class="row">
   <!-- Success and Error Messages for the user --> 
   <!-- Question, task id, photo and action buttons for answering the question-->
-  <div class="span8 offset3">
+  <div class="span10 offset1" style="height:50px">
     <div id="success" class="alert alert-success" style="display:none;">
       <a class="close">×</a>
       <strong>Well done!</strong> Your answer has been saved</strong>
@@ -18,17 +29,22 @@
       <a class="close">×</a>
       <strong>Error!</strong> Something went wrong, please contact the site administrators</strong>
     </div>
-  </div>
+    <div id="throbber"></div>
+</div> <!-- End Success and Error Messages for the user -->
 
-  <div class="span8 offset3">
+  <div class="span10 offset1">
     <div id="question">
       <h1>Question</h1>
       <p>Task: <span id="task-id" class="label label-warning">#</span></p>
       <ul class="thumbnails">
-              <li><a id="photo-link" href="#" class="thumbnail"><img id="photo" src="#"></a></li>
+          <li class="span10">
+          <a id="photo-link" href="#" class="thumbnail">
+              <img id="photo" src="#" onload="spinnerStop()">
+          </a>
+          </li>
       </ul>
     </div>
-    <div id="answer">
+    <div id="answer" style="text-align:center">
       <button class="btn btn-success" onclick="submitTask('Yes')">Yes</button>
       <button class="btn btn-info" onclick="submitTask('No')">No</button>
       <button class="btn" onclick="pybossa.newTask('flickrperson').done( function( data ) { loadData( data ) });">I don't know</button>
@@ -36,12 +52,37 @@
   </div>
 </div>
 <script src="/static/js/pybossa/pybossa.js" type="text/javascript"></script>
+<script src="/static/js/throbber/throbber.js" type="text/javascript"></script>
 <script>
+var spinner = new Throbber({
+    color: 'white',
+    size: 90
+});
 
+// The spinner is attached to a div overlayed in top of the photo. 
+// This div is only shown when the spinner is active, 
+// otherwise, the div is hidden from the view to show the photo.¬
+
+spinner.appendTo (document.getElementById('throbber'));
+
+// This function shows the spinner div and starts its animation¬
+function spinnerStart() {
+    $("#throbber").show();
+    spinner.start();
+    console.log("Spinner started!");
+}
+
+// This function stops the spinner and hides the spinner div¬
+function spinnerStop() {
+    spinner.stop()
+    $("#throbber").hide();
+    console.log("Spinner stopped!");
+}
 // Function to load the TaskRun data into the HTML skeleton
 function loadData( data ) {
     // Uncomment next line for debugging purposes
     //console.log( data );
+    spinnerStart();
     $("#question h1").text(data.question);
     $("#task-id").text(data.task.id);
     $("#photo-link").attr("href", data.task.info.link);
@@ -58,7 +99,7 @@ function submitTask(answer) {
         //console.log("Answer saved!");
         // FadeIn & Out the success div feedback
         $("#success").fadeIn();
-        setTimeout(function() { $("#success").fadeOut() }, 1000);
+        setTimeout(function() { $("#success").fadeOut() }, 2000);
         // Load a new task
         pybossa.newTask("flickrperson").done( function( data ){ loadData( data ) });
     });

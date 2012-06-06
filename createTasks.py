@@ -16,8 +16,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with PyBOSSA.  If not, see <http://www.gnu.org/licenses/>.
 
+import urllib
 import urllib2
 import json
+import re
+import string
 import datetime
 from optparse import OptionParser
 
@@ -146,11 +149,21 @@ def get_flickr_photos(size="big"):
     """
     # Get the ID of the photos and load it in the output var
     print('Contacting Flickr for photos')
-    query = "http://api.flickr.com/services/feeds/photos_public.gne?nojsoncallback=1&format=json"
+    url = "http://api.flickr.com/services/feeds/photos_public.gne"
+    values = {
+        'nojsoncallback': 1,
+        'format': "json",
+        #'ids':'25053835@N03'
+        }
+    query = url + "?" + urllib.urlencode(values)
     urlobj = urllib2.urlopen(query)
     data = urlobj.read()
     urlobj.close()
-    output = json.loads(data)
+    # The returned JSON object by Flickr is not correctly escaped, so we have to fix it
+    # see http://stackoverflow.com/questions/9312196/how-to-convert-this-string-into-json-format-using-json-loads
+    regex = re.compile(r'\\(?![/u"])')
+    fixed = regex.sub(r"\\\\", data)
+    output = json.loads(fixed)
     print('Data retrieved from Flickr')
 
     # For each photo ID create its direct URL according to its size: big, medium, small
@@ -158,7 +171,8 @@ def get_flickr_photos(size="big"):
     photos = []
     for idx, photo in enumerate(output['items']):
         print 'Retrieved photo: %s' % idx
-        photos.append({'link': photo["link"], 'url':  photo["media"]["m"]})
+        imgUrl = string.replace(photo["media"]["m"],"_m.jpg","_b.jpg")
+        photos.append({'link': photo["link"], 'url':  imgUrl})
     return photos
 
 
