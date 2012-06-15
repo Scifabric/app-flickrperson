@@ -33,7 +33,7 @@
   </div> <!-- End Success and Error Messages for the user -->
 </div>
 
-<div class="row">
+<div class="row skeleton">
   <div id="question" class="span12">
       <h1>Question</h1>
       <p>Task: <span id="task-id" class="label label-warning">#</span></p>
@@ -92,11 +92,17 @@ function spinnerStop() {
 function loadData( data ) {
     // Uncomment next line for debugging purposes
     //console.log( data );
-    spinnerStart();
-    $("#question h1").text(data.question);
-    $("#task-id").text(data.task.id);
-    $("#photo-link").attr("href", data.task.info.link);
-    $("#photo").attr("src",data.task.info.url);
+    if ( !$.isEmptyObject(data.task) ) {
+        spinnerStart();
+        $("#question h1").text(data.question);
+        $("#task-id").text(data.task.id);
+        $("#photo-link").attr("href", data.task.info.link);
+        $("#photo").attr("src",data.task.info.url);
+    }
+   else {
+        $(".skeleton").hide();
+        $("#finish").fadeIn();
+    }
 }
 
 // Function to submit and save the TaskRun in PyBossa
