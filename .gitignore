@@ -1,4 +1,6 @@
 *.egg-info
+env/
+*.un~
 .*.swp
 *.pyc
 *.db
