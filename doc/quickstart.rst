@@ -18,10 +18,5 @@ Quickstart
 3. Create an account in http://pybossa.com (check the Register option!).
 4. Check your profile, your user name in blue in the top bar, to get your **API-KEY**.
 5. Copy the **API-KEY** so you can create the application and the tasks (modify the name if you want for the application) using the createTasks.py script.
-6. Run the command python: createTasks.py -u http://pybossa.com -k **API-KEY**.
+6. Run the command python: createTasks.py -u http://pybossa.com -k **API-KEY** -c.
 7. To see the application up and running, check in the top bar of http://pybossa.com the Applications field. Click it to show the dropdown menu, and select flickrperson. This will open the application and you will be able to submit some results.
-
-.. note:
-
-  Sometimes Flickr will return a non-valid json object, so you will have to re-run the createTasks.py script to create the tasks.
-

@@ -70,20 +70,34 @@ saves the *link* of the Flickr web page publishing the photo, as well as the
 For example:
 
   * **Link**: http://www.flickr.com/photos/teleyinex/2945647308/
-  * **URL**: http://farm4.staticflickr.com/3208/2945647308_f048cc1633_m.jpg
+  * **URL_m**: http://farm4.staticflickr.com/3208/2945647308_f048cc1633_m.jpg
+  * **URL_b**: http://farm4.staticflickr.com/3208/2945647308_f048cc1633_b.jpg
 
-Those two variables (Link and URL) will be stored in a JSON object::
+Those three variables (Link and URL for big and medium image sizes)
+will be stored in a JSON object::
 
   { 'link': 'http://www.flickr.com/photos/teleyinex/2945647308/',
-    'url': 'http://farm4.staticflickr.com/3208/2945647308_f048cc1633_m.jpg' }
+    'url_m': 'http://farm4.staticflickr.com/3208/2945647308_f048cc1633_m.jpg', 
+    'url_b': 'http://farm4.staticflickr.com/3208/2945647308_f048cc1633_b.jpg' }
 
 And saved into the task field **info** of the task model. As Flickr only
 publishes the latest 20 uploaded photos in their public feed, the script will
 create only 20 tasks in PyBossa.
 
+
 In order to create the application and its tasks, run the following script::
 
-  python createTasks.py -u http://PYBOSSA-SERVER -k API-KEY
+  python createTasks.py -u http://PYBOSSA-SERVER -k API-KEY -c 
+  
+By default PyBossa will request 30 TaskRuns or Answers for each task. This
+value can be changed via the API, for example in order to get 100 answers for
+each task run the following command::
+
+  python createTasks.py -u http://PYBOSSA-SERVER -k API-KEY -c -n 100
+
+If you need an overview of all the available command line arguments, run::
+
+  python createTasks.py -h
 
 Here is a list of all the Python methods that use the PyBossa API:
 
@@ -111,7 +125,7 @@ HTML template, and take actions based on the users's answers.
 --------------------
 
 The file_ **template.html** has the skeleton to show the tasks. The file has three 
-sections or <div>:
+sections or <div class="skeleton">:
 
   * **<div> for the warnings actions**. When the user saves an answer, a success
     feedback message is shown to the user. There is also an error one for
@@ -146,7 +160,36 @@ template only has to define the structure to present the data from the tasks to 
 users and the action buttons, input methods, etc. to retrieve and save the 
 answer from the volunteers.
 
-2. Loading the Task data
+2. Adding an icon to the application
+------------------------------------
+
+It is possible also to add a nice icon for the application. By default PyBossa
+will render a 100x100 pixels empty thumbnail for those applications that do not
+provide it. If you want to add an icon you only have to upload the thumbnail of
+size 100x100 pixels to a hosting service like Flickr, ImageShack, etc. and use
+the URL image link to include it in the **info** field (check createTask.py
+script as it has an example)::
+
+  info = { 'thumbnail': http://hosting-service/thumbnail-name.png,
+           'task_presenter': template.html file
+         }
+
+3. Updating the template for all the tasks
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is possible to update the template of the application without
+having to re-create the application and its tasks. In order to update the
+template, you only have to modify the file template.html and run the following
+command::
+
+  python createTasks.py -u http://PYBOSSA-SERVER -k API-KEY -t
+
+This is the used method to update the template:
+
+.. automodule:: createTasks 
+   :members: update_template
+
+4. Loading the Task data
 ------------------------
 
 All the action takes place in the file_
@@ -182,7 +225,7 @@ do something like this::
   $("#question h1").text(data.question);
   $("#task-id").text(data.task.id);
   $("#photo-link").attr("href", data.task.info.link);
-  $("#photo").attr("src",data.task.info.url);
+  $("#photo").attr("src",data.task.info.url_m);
 
 and wrap it in the *pybossa.newTask* method::
 
@@ -191,7 +234,7 @@ and wrap it in the *pybossa.newTask* method::
       $("#question h1").text(data.question);
       $("#task-id").text(data.task.id);
       $("#photo-link").attr("href", data.task.info.link);
-      $("#photo").attr("src",data.task.info.url);
+      $("#photo").attr("src",data.task.info.url_);
     };
   );
 
@@ -199,10 +242,31 @@ Every time that we want to load a new task, we will have to call the above
 function, so it will be better if we create a specific function for this
 purpose (check the *loadData* function in the script).
 
+At some point the user will not receive more tasks for the application, so it
+will be really helpful for the user to flash a message giving thanks to the
+user. In the warnings section, we have a specific div to show the finish
+message to the user, saying thank you to the user and inviting him to help in
+other applications. As the skeleton is no longer useful, there is no more
+images that will be loaded for this user, it should be hidden.Thus, in the
+**loadData** function we could run the following test to see if we have to load
+the image, or pop-up the finish message::
+
+  if ( !$.isEmptyObject(data.task) ) {
+     spinnerStart();
+     $("#question h2").text(data.question);
+     $("#task-id").text(data.task.id);
+     $("#photo-link").attr("href", data.task.info.link);
+     $("#photo").attr("src",data.task.info.url_m);
+  }
+  else {
+     $(".skeleton").hide();
+     $("#finish").fadeIn();
+  }
+
 Once the data have been loaded, it is time to bind the buttons *onclick*
 events to functions that will save the answer from the user in the data base.
 
-3. Saving the answer
+5. Saving the answer
 --------------------
 
 Once the task has been presented, the users can click on the answer buttons:
@@ -256,7 +320,7 @@ only missing button is the "I don't know" which will use the same event,
 For more details about the code, please, check the `template file
 <https://github.com/PyBossa/app-flickrperson/blob/master/app-flickrperson/template.html>`_.
 
-4. Test the task presenter
+6. Test the task presenter
 --------------------------
 
 In order to test the application task presenter, go to the following URL:
@@ -266,7 +330,7 @@ In order to test the application task presenter, go to the following URL:
 The presenter will load one task, and you will be able to submit and save one
 answer for the current task.
 
-5. Check the results
+7. Check the results
 --------------------
 
 In order to see the answers from the volunteers, you can open in your web
