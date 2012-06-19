@@ -114,7 +114,7 @@ def create_app(api_url , api_key, name=None, short_name=None, description=None):
         print("Error creating the application")
         return 0
 
-def create_task(api_url , api_key, app_id, photo):
+def create_task(api_url , api_key, app_id, n_answers, photo):
     """
     Creates tasks for the application
 
@@ -123,7 +123,9 @@ def create_task(api_url , api_key, app_id, photo):
     :rtype: integer
     """
     # Data for the tasks
-    info = dict (link = photo['link'], url = photo['url'])
+    info = dict (n_answers=int(n_answers), link = photo['link'], url_m = photo['url_m'], 
+                 url_b = photo['url_b']
+                )
     data = dict (app_id = app_id, state = 0, info = info, calibration = 0, priority_0 = 0)
     data = json.dumps(data)
 
@@ -138,6 +140,66 @@ def create_task(api_url , api_key, app_id, photo):
         return True
     else:
         return False
+
+def update_template(api_url , api_key, app='flickrperson'):
+    """
+    Update tasks template for the application flickrperson
+
+    :arg string app: Application short_name in PyBossa.
+    :returns: True when the template has been updated.
+    :rtype: boolean
+    """
+    request = urllib2.Request('%s/api/app?short_name=%s' % 
+                              (api_url,app)
+                             )
+    request.add_header('Content-type', 'application/json')
+
+    res = urllib2.urlopen(request).read()
+    res = json.loads(res)
+    res = res[0]
+    if res.get('short_name'):
+        # Re-read the template
+        file = open('template.html')
+        text = file.read()
+        file.close()
+        info = dict(thumbnail=res['info']['thumbnail'], task_presenter=text)
+        data = dict(id = res['id'], name=res['name'], short_name=res['short_name'],
+                    description=res['description'], hidden=res['hidden'],
+                    info = info)
+        data = json.dumps(data)
+        request = urllib2.Request(api_url + '/api/app/' + str(res['id']) + '?api_key=' + api_key)
+        request.add_data(data)
+        request.add_header('Content-type', 'application/json')
+        request.get_method = lambda: 'PUT'
+
+        if (urllib2.urlopen(request).getcode() == 200): 
+            return True
+        else:
+            return False
+
+    else:
+        return False
+
+
+    # Data for the tasks
+    info = dict (n_answers=2, link = photo['link'], url_m = photo['url_m'], 
+                 url_b = photo['url_b']
+                )
+    data = dict (app_id = app_id, state = 0, info = info, calibration = 0, priority_0 = 0)
+    data = json.dumps(data)
+
+    # Setting the POST action
+    request = urllib2.Request(api_url + '/api/task' + '?api_key=' + api_key)
+    request.add_data(data)
+    request.add_header('Content-type', 'application/json')
+
+    # Create the task
+    output = json.loads(urllib2.urlopen(request).read())
+    if (output['id'] != None):
+        return True
+    else:
+        return False
+
 
 def get_flickr_photos(size="big"):
     """
@@ -171,8 +233,9 @@ def get_flickr_photos(size="big"):
     photos = []
     for idx, photo in enumerate(output['items']):
         print 'Retrieved photo: %s' % idx
-        imgUrl = string.replace(photo["media"]["m"],"_m.jpg","_b.jpg")
-        photos.append({'link': photo["link"], 'url':  imgUrl})
+        imgUrl_m = photo["media"]["m"]
+        imgUrl_b = string.replace(photo["media"]["m"],"_m.jpg","_b.jpg")
+        photos.append({'link': photo["link"], 'url_m':  imgUrl_m, 'url_b': imgUrl_b})
     return photos
 
 
@@ -184,6 +247,21 @@ if __name__ == "__main__":
     
     parser.add_option("-u", "--url", dest="api_url", help="PyBossa URL http://domain.com/", metavar="URL")
     parser.add_option("-k", "--api-key", dest="api_key", help="PyBossa User API-KEY to interact with PyBossa", metavar="API-KEY")
+    parser.add_option("-c", "--create-app", action="store_true", dest="create_app",
+                      help="Create the application",
+                      metavar="CREATE-APP"
+                     )
+    parser.add_option("-t", "--update-template", action="store_true",
+                      dest="update_template", 
+                      help="Update Tasks template",
+                      metavar="UPDATE-TEMPLATE"
+                     )
+    parser.add_option("-n", "--number-answers",
+                      dest="n_answers", 
+                      help="Number of answers per task",
+                      metavar="N-ANSWERS"
+                     )
+
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
     
     (options, args) = parser.parse_args()
@@ -198,13 +276,18 @@ if __name__ == "__main__":
        print('Running against PyBosssa instance at: %s' % options.api_url)
        print('Using API-KEY: %s' % options.api_key)
 
-    app_id = create_app(options.api_url, options.api_key)
-    # First of all we get the URL photos
-    # WARNING: Sometimes the flickr feed returns a wrong escape character, so it may
-    # fail at this step
-    photos = get_flickr_photos()
-    # Finally, we have to create a set of tasks for the application
-    # For this, we get first the photo URLs from Flickr
-    for photo in photos:
-        create_task(options.api_url, options.api_key, app_id, photo)
+    if options.create_app:
+        app_id = create_app(options.api_url, options.api_key)
+        # First of all we get the URL photos
+        photos = get_flickr_photos()
+        # Finally, we have to create a set of tasks for the application
+        # For this, we get first the photo URLs from Flickr
+        for photo in photos:
+            if options.n_answers:
+                create_task(options.api_url, options.api_key, app_id, options.n_answers, photo)
+            else:
+                create_task(options.api_url, options.api_key, app_id, 30, photo)
 
+    if options.update_template:
+            print "Updating app template"
+            update_template(options.api_url, options.api_key)
