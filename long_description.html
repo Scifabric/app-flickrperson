@@ -1,0 +1,66 @@
+<div class="row">
+    <div class="span12">
+        <p>
+        Flickr Person is a demo application for PyBossa that shows how you can 
+        crowdsourcing an image classification problem.
+        </p>
+        <p>
+        This application uses the Flickr web service as the source of the data.
+        By using Flickr, we have the possibility of using its API to refine the
+        searches, and looking for specific tags or descriptions that match a 
+        specific criteria, i.e. houses of 1920 or tsunami.
+        </p>
+        <p>
+        In this demo application, we use a very simple approach by polling the 
+        latest 20 published photos in the public Flickr feed.
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="span10">
+        <p>
+        The feed provides the direct link to the photo. This link is used to show 
+        the image to the users, and ask them the following question: <strong>Do 
+            you see a human in this photo?</strong> 
+        </p>
+        <p>
+        The application provides three simple answers as action buttons: 
+        <ul>
+            <li>Yes</li>
+            <li>No and</li>
+            <li><a href="#" rel="tooltip" title="Sometimes a photo has been removed,
+                so you don't know if there is a human in it or not">I don't know</a>
+                </li>
+        </ul>
+        </p>
+    </div>
+    <div class="span2">
+        <ul class="thumbnails pull-right">
+            <li class="span2">
+            <img class="thumbnail" src="http://farm7.staticflickr.com/6109/6286728068_2f3c6912b8_q.jpg">
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="span12">
+        <p>
+        Based on the answer of the users, we will be able to classify the photos, 
+        distributing the tasks (thanks to PyBossa) to different users and volunteers.
+        </p>
+        <p>
+        <span class="label label-warning">
+            <i class="icon icon-white icon-bullhorn"></i>
+             Note</span> If you want to learn more about how to use this application as a template,
+         check the:
+         <ul>
+             <li><a href="http://github.com/PyBossa/app-flickrperson">code</a></li>
+             <li><a href="http://docs.pybossa.com/">the official documentation of PyBossa</a> and </li>
+             <li><a href="http://docs.pybossa.com/en/latest/user/create-application-tutorial.html">the step by step tutorial.</a></li>
+         </ul>
+        </p>
+    </div>
+</div>
+<script type="text/javascript">
+    $("[rel=tooltip]").tooltip();
+</script>

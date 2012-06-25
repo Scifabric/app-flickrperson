@@ -73,6 +73,13 @@ For example:
   * **URL_m**: http://farm4.staticflickr.com/3208/2945647308_f048cc1633_m.jpg
   * **URL_b**: http://farm4.staticflickr.com/3208/2945647308_f048cc1633_b.jpg
 
+.. note:
+
+    Flickr creates from the original image, different cropped versions of the
+    image. Flickr uses a pattern to distinguish them: **_m** for medium size,
+    and **_b** for the big ones. There are more options, so if you need more
+    help in this matter, check the official Flickr documentation.
+
 Those three variables (Link and URL for big and medium image sizes)
 will be stored in a JSON object::
 
@@ -103,6 +110,30 @@ Here is a list of all the Python methods that use the PyBossa API:
 
 .. automodule:: createTasks 
    :members: create_app, update_app, delete_app
+
+Providing more details about the application
+============================================
+
+If you check the source code, you will see that there is a file named
+*long_description.html*. This file has a long description of the application,
+explaining different aspects of it.
+
+This information is not mandatory, however it will be very useful for the users
+as they will get a bit more of information about the application goals.
+
+The file can be composed using HTML or plain text. As PyBossa is using `Twitter
+Bootstrap <http://twitter.github.com/bootstrap/>`_ you can use all the available 
+CSS properties that this framework provides.
+
+The long description is shown in the application home page::
+
+ http://pybossa.com/app/flickrperson
+
+If you want to modify the description you have two options:
+
+ * Edit it via the web interface, or
+ * modify locally the *long_description.html* file and run the command again
+   with the **-t** option to update it.
 
 Presenting the Tasks to the user
 ================================
@@ -175,7 +206,8 @@ script as it has an example)::
          }
 
 3. Updating the template for all the tasks
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------------------
+
 
 It is possible to update the template of the application without
 having to re-create the application and its tasks. In order to update the
