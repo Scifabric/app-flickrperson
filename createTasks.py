@@ -268,20 +268,31 @@ if __name__ == "__main__":
     # Arguments for the application
     usage = "usage: %prog [options]"
     parser = OptionParser(usage)
+    # URL where PyBossa listens
     parser.add_option("-u", "--url", dest="api_url",
                       help="PyBossa URL http://domain.com/", metavar="URL")
+    # API-KEY
     parser.add_option("-k", "--api-key", dest="api_key",
                       help="PyBossa User API-KEY to interact with PyBossa",
                       metavar="API-KEY")
+    # Create App
     parser.add_option("-c", "--create-app", action="store_true",
                       dest="create_app",
                       help="Create the application",
                       metavar="CREATE-APP")
+    # Update template for tasks and long_description for app
     parser.add_option("-t", "--update-template", action="store_true",
                       dest="update_template",
                       help="Update Tasks template",
                       metavar="UPDATE-TEMPLATE"
                      )
+    parser.add_option("-x", "--extra-task", action="store_true",
+                      dest="add_more_tasks",
+                      help="Add more tasks",
+                      metavar="ADD-MORE-TASKS"
+                      )
+    # Modify the number of TaskRuns per Task
+    # (default 30)
     parser.add_option("-n", "--number-answers",
                       dest="n_answers",
                       help="Number of answers per task",
@@ -315,10 +326,28 @@ if __name__ == "__main__":
             else:
                 create_task(options.api_url, options.api_key, app_id,
                             30, photo)
+    else:
+        if options.add_more_tasks:
+            request = urllib2.Request('%s/api/app?short_name=%s' %
+                                      (options.api_url, 'flickrperson'))
+            request.add_header('Content-type', 'application/json')
+
+            app = urllib2.urlopen(request).read()
+            app = json.loads(app)
+            app = app[0]
+            photos = get_flickr_photos()
+            for photo in photos:
+                if options.n_answers:
+                    create_task(options.api_url, options.api_key, app['id'],
+                                options.n_answers, photo)
+                else:
+                    create_task(options.api_url, options.api_key, app['id'],
+                                30, photo)
 
     if options.update_template:
         print "Updating app template"
         update_template(options.api_url, options.api_key)
 
-    if not options.create_app and not options.update_template:
+    if not options.create_app and not options.update_template\
+            and not options.add_more_tasks:
         parser.error("Please check --help or -h for the available options")
