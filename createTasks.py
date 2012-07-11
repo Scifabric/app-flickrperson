@@ -225,6 +225,48 @@ def update_template(api_url, api_key, app='flickrperson'):
     else:
         return False
 
+def update_tasks(api_url, api_key, app='flickrperson'):
+    """
+    Update tasks question 
+
+    :arg string app: Application short_name in PyBossa.
+    :returns: True when the template has been updated.
+    :rtype: boolean
+    """
+    request = urllib2.Request('%s/api/app?short_name=%s' %
+                              (api_url, app))
+    request.add_header('Content-type', 'application/json')
+
+    res = urllib2.urlopen(request).read()
+    res = json.loads(res)
+    app = res[0]
+    if app.get('short_name'):
+        request = urllib2.Request('%s/api/task?app_id=%s&limit=%s' %
+                                  (api_url, app['id'], 1000))
+        request.add_header('Content-type', 'application/json')
+
+        res = urllib2.urlopen(request).read()
+        tasks = json.loads(res)
+
+        for t in tasks:
+            t['info']['question']=u'Do you see a human in this photo?'
+            data = dict(info=t['info'],app_id=t['app_id'])
+            data = json.dumps(data)
+            request = urllib2.Request(api_url + '/api/task/' + str(t['id']) + \
+                                      '?api_key=' + api_key)
+            request.add_data(data)
+            request.add_header('Content-type', 'application/json')
+            request.get_method = lambda: 'PUT'
+
+            if (urllib2.urlopen(request).getcode() == 200):
+                print "Task ID: %s  updated" % t['id']
+            else:
+                return False
+
+    else:
+        return False
+
+
 
 def get_flickr_photos(size="big"):
     """
@@ -287,6 +329,14 @@ if __name__ == "__main__":
                       help="Update Tasks template",
                       metavar="UPDATE-TEMPLATE"
                      )
+
+    # Update tasks question
+    parser.add_option("-q", "--update-tasks", action="store_true",
+                      dest="update_tasks",
+                      help="Update Tasks question",
+                      metavar="UPDATE-TASKS"
+                     )
+
     parser.add_option("-x", "--extra-task", action="store_true",
                       dest="add_more_tasks",
                       help="Add more tasks",
@@ -348,6 +398,10 @@ if __name__ == "__main__":
     if options.update_template:
         print "Updating app template"
         update_template(options.api_url, options.api_key)
+
+    if options.update_tasks:
+        print "Updating task question"
+        update_tasks(options.api_url, options.api_key)
 
     if not options.create_app and not options.update_template\
             and not options.add_more_tasks:

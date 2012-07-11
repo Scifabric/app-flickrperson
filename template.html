@@ -137,7 +137,7 @@ function loadTask( task_id ) {
     t.done( function (task) {
         if ( !$.isEmptyObject(task) ) {
             spinnerStart();
-            if (task.status=='completed') {
+            if (task.state=='completed') {
                 $('#answer').hide();
                 $('#disqus_thread').hide();
                 $('#taskcompleted').show();
