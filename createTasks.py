@@ -138,9 +138,10 @@ def create_task(api_url, api_key, app_id, n_answers, photo):
     :rtype: integer
     """
     # Data for the tasks
-    info = dict(n_answers=int(n_answers), link=photo['link'],
-                 url_m=photo['url_m'],
-                 url_b=photo['url_b'])
+    info = dict(question="Do you see a human in this photo?",
+                n_answers=int(n_answers), link=photo['link'],
+                url_m=photo['url_m'],
+                url_b=photo['url_b'])
 
     data = dict(app_id=app_id, state=0, info=info,
                  calibration=0, priority_0=0)

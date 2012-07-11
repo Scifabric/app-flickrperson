@@ -42,6 +42,7 @@ Useful Links
    :maxdepth: 2
 
    flickrperson
+   advance
 
 Indices and tables
 ==================

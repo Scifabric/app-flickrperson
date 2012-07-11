@@ -152,6 +152,13 @@ HTML template, and take actions based on the users's answers.
   user_id. For anonymous users the submitted task will only have the user IP
   address.
 
+.. note::
+  PyBossa features a new system to show to the users via the URL the task for
+  the application. This new endpoints:
+  http://pybossa.com/app/flickrperson/task/id
+  will allow to use systems like Disqus, as every task will have their own
+  URL
+
 1. The HTML Skeleton
 --------------------
 
