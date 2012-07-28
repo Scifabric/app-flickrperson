@@ -225,9 +225,10 @@ def update_template(api_url, api_key, app='flickrperson'):
     else:
         return False
 
+
 def update_tasks(api_url, api_key, app='flickrperson'):
     """
-    Update tasks question 
+    Update tasks question
 
     :arg string app: Application short_name in PyBossa.
     :returns: True when the template has been updated.
@@ -249,8 +250,8 @@ def update_tasks(api_url, api_key, app='flickrperson'):
         tasks = json.loads(res)
 
         for t in tasks:
-            t['info']['question']=u'Do you see a human in this photo?'
-            data = dict(info=t['info'],app_id=t['app_id'])
+            t['info']['question'] = u'Do you see a human in this photo?'
+            data = dict(info=t['info'], app_id=t['app_id'])
             data = json.dumps(data)
             request = urllib2.Request(api_url + '/api/task/' + str(t['id']) + \
                                       '?api_key=' + api_key)
@@ -265,7 +266,6 @@ def update_tasks(api_url, api_key, app='flickrperson'):
 
     else:
         return False
-
 
 
 def get_flickr_photos(size="big"):
