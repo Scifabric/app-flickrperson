@@ -2,8 +2,8 @@
     #throbber {
         padding: 10px;
         position:absolute;
-        left: 50%;
-        top:10%;
+        left: 45%;
+        top:45%;
         margin: -50px 0 0 -50px;
         z-index: 10000;
         width: 100px;
@@ -12,28 +12,28 @@
 </style>
 
 <div class="row">
-  <!-- Success and Error Messages for the user --> 
-  <!-- Question, task id, photo and action buttons for answering the question-->
-  <div class="span8 offset2" style="height:50px">
-    <div id="success" class="alert alert-success" style="display:none;">
-      <a class="close">×</a>
-      <strong>Well done!</strong> Your answer has been saved</strong>
+    <!-- Success and Error Messages for the user --> 
+    <!-- Question, task id, photo and action buttons for answering the question-->
+    <div class="span6 offset2" style="height:50px">
+        <div id="success" class="alert alert-success" style="display:none;">
+            <a class="close">×</a>
+            <strong>Well done!</strong> Your answer has been saved</strong>
     </div>
     <div id="taskcompleted" class="alert alert-info" style="display:none;">
-      <strong>The task has been completed!</strong> Thanks a lot!</strong>
-    </div>
+        <strong>The task has been completed!</strong> Thanks a lot!</strong>
+</div>
 
-    <div id="finish" class="alert alert-success" style="display:none;">
-      <strong>Congratulations!</strong> You have participated in all available tasks!</strong>
-      <br/>
-      <div class="alert-actions">
-              <a class="btn small" href="/">Go back</a>
-              <a class="btn small" href="/app">or, Check other applications</a>
-      </div>
+<div id="finish" class="alert alert-success" style="display:none;">
+    <strong>Congratulations!</strong> You have participated in all available tasks!</strong>
+<br/>
+<div class="alert-actions">
+    <a class="btn small" href="/">Go back</a>
+    <a class="btn small" href="/app">or, Check other applications</a>
+</div>
     </div>
     <div id="error" class="alert alert-error" style="display:none;">
-      <a class="close">×</a>
-      <strong>Error!</strong> Something went wrong, please contact the site administrators</strong>
+<a class="close">×</a>
+<strong>Error!</strong> Something went wrong, please contact the site administrators</strong>
     </div>
   </div> <!-- End Success and Error Messages for the user -->
 </div>
@@ -42,31 +42,41 @@
 <div id="throbber"></div>
 
 <div class="row skeleton">
-  <div id="question" class="span8 offset2">
+  <div id="question" class="span6 offset2">
       <h2>Question</h2>
-      <p>Task: <span id="task-id" class="label label-warning">#</span></p>
+      <p>You are working now on task: <span id="task-id" class="label label-warning">#</span></p>
   </div>
 </div>
 
 <div class="row skeleton">
+    <div class="span6 offset2">
+        <p>You have completed: <span id="done" class="label label-info"></span> tasks from
+        <span id="total" class="label label-inverse"></span></p>
+        <div class="progress progress-striped">
+            <div id="progress" rel="tooltip" title="#" class="bar" style="width: 0%;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row skeleton" style="text-align:center">
       <!-- Answer buttons -->
-      <div id="answer" class="span8 offset2">
-          <button class="btn btn-success" onclick="submitTask('Yes')"><i class="icon icon-white icon-ok"></i> Yes</button>
-          <button class="btn btn-danger" onclick="submitTask('No')"><i class="icon icon-white icon-remove"></i> No</button>
-          <button class="btn" onclick="submitTask('NotKnown')"><i class="icon icon-white icon-refresh"></i> I don't know</button>
+      <div id="answer" class="span6 offset2">
+          <button class="btn btn-large btn-success" onclick="submitTask('Yes')"><i class="icon icon-white icon-thumbs-up"></i> Yes</button>
+          <button class="btn btn-large btn-danger" onclick="submitTask('No')"><i class="icon icon-white icon-thumbs-down"></i> No</button>
+          <button class="btn btn-large" onclick="submitTask('NotKnown')"><i class="icon icon-white icon-question-sign"></i> I don't know</button>
       </div>
 </div>
 
 <div class="row skeleton" style="padding-top:10px;">
-  <div class="span8 offset2">
+  <div class="span6 offset2">
     <a id="photo-link" href="#">
-      <img id="photo" src="#" onload="spinnerStop()">
+      <img id="photo" src="http://img339.imageshack.us/img339/9017/loadingo.png" onload="spinnerStop()" style="max-width=100%">
     </a>
   </div>
 </div>
 
 <div class="row skeleton">
-<div id="disqus_thread" class="span8 offset2"></div>
+<div id="disqus_thread" class="span6 offset2"></div>
 </div>
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -121,7 +131,7 @@ function loadData( data ) {
         $("#photo-link").attr("href", data.task.info.link);
         $("#photo").attr("src",data.task.info.url_m);
     }
-   else {
+    else {
         $(".skeleton").hide();
         $("#finish").fadeIn();
     }
@@ -142,15 +152,27 @@ function loadTask( task_id ) {
                 $('#disqus_thread').hide();
                 $('#taskcompleted').show();
             }
+            loadUserProgress();
             $("#question h2").text(task.info.question);
             $("#task-id").text(task.id);
             $("#photo-link").attr("href", task.info.link);
-            $("#photo").attr("src", task.info.url_m);
+            $("#photo").attr("src", task.info.url_b);
         }
-       else {
+        else {
             $(".skeleton").hide();
             $("#finish").fadeIn();
         }
+    });
+}
+
+function loadUserProgress() {
+    pybossa.userProgress('flickrperson').done(function(data){
+        var pct = Math.round((data.done*100)/data.total);
+        $("#progress").css("width", pct.toString() +"%");
+        $("#progress").attr("title", pct.toString() + "% completed!");
+        $("#progress").tooltip({'placement': 'left'}); 
+        $("#total").text(data.total);
+        $("#done").text(data.done);
     });
 }
 
@@ -171,27 +193,24 @@ function submitTask(answer) {
     });
 }
 
-pathArray = window.location.pathname.split('/');
-if (window.location.pathname.indexOf('/task/')!=-1) {
-    var l = pathArray.length;
-    var i = 0;
-    for (i=0;i<l;i++) {
-        if (pathArray[i]=='task') {
-            loadTask(pathArray[i+1]);
-        }
-    }
+// Check if the user is loading directly a task or requesting a new one
+var taskId = pybossa.getCurrentTaskId(window.location.pathname);
+
+if (taskId){
+    // The user is loading directly a task, so load then input data
+    loadTask(taskId);
 }
 else {
+    // The user is requesting a new task, so get a new one
     pybossa.newTask("flickrperson").done( function( data ) { 
 
         if ( !$.isEmptyObject(data.task) ) {
             window.location.pathname = "/app/flickrperson/task/" + data.task.id;
         }
-       else {
+        else {
             $(".skeleton").hide();
             $("#finish").fadeIn();
         }
     });
 }
-
 </script>
