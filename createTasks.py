@@ -22,250 +22,18 @@ import json
 import re
 import string
 from optparse import OptionParser
+import pbclient
 
 
-def delete_app(api_url, api_key, id):
-    """
-    Deletes the Flickr Person Finder application.
-
-    :arg integer id: The ID of the application
-    :returns: True if the application has been deleted
-    :rtype: boolean
-    """
-    request = urllib2.Request(api_url + '/api/app/' + str(id) + \
-                              '?api_key=' + api_key)
-    request.get_method = lambda: 'DELETE'
-
-    if (urllib2.urlopen(request).getcode() == 204):
-        return True
-    else:
-        return False
-
-
-def update_app(api_url, api_key, id, name=None):
-    """
-    Updates the name of the Flickr PErson Finder application
-    :arg integer id: The ID of the application
-    :arg string name: The new name for the application
-    :returns: True if the application has been updated
-    :rtype: boolean
-    """
-    data = dict(id=id, name=name)
-    data = json.dumps(data)
-    request = urllib2.Request(api_url + '/api/app/' + str(id) + \
-                              '?api_key=' + api_key)
-    request.add_data(data)
-    request.add_header('Content-type', 'application/json')
-    request.get_method = lambda: 'PUT'
-
-    if (urllib2.urlopen(request).getcode() == 200):
-        return True
-    else:
-        return False
-
-
-def create_app(api_url, api_key, name=None, short_name=None,
-               description=None):
-    """
-    Creates the Flickr Person Finder application.
-    :arg string name: The application name.
-    :arg string short_name: The slug application name.
-    :arg string description: A short description of the application.
-
-    :returns: Application ID or 0 in case of error.
-    :rtype: integer
-    """
-    print('Creating app')
-    name = u'Flickr Person PHinder'  # Name with a typo
-    short_name = u'flickrperson'
-    description = u'Do you see a human in this photo?'
-    # JSON Blob to present the tasks for this app to the users
-    # First we read the template:
-    file = open('template.html')
-    text = file.read()
-    file.close()
-    # HTML Blob with a long description for the application
-    file = open('long_description.html')
-    long_description = file.read()
-    file.close()
-    info = dict(thumbnail="http://img37.imageshack.us/" + \
-                "img37/156/flickrpersonthumbnail.png",
-                 task_presenter=text)
-    data = dict(name=name, short_name=short_name, description=description,
-                long_description=long_description,
-                hidden=0, info=info)
-    data = json.dumps(data)
-
-    # Checking which apps have been already registered in the DB
-    apps = json.loads(urllib2.urlopen(api_url + '/api/app' + \
-                      '?api_key=' + api_key).read())
-    for app in apps:
-        if app['short_name'] == short_name:
-            print('{app_name} app is already registered in the DB'\
-                    .format(app_name=name))
-            print('Deleting it!')
-            if (delete_app(api_url, api_key, app['id'])):
-                print "Application deleted!"
-    print("The application is not registered in PyBOSSA. Creating it...")
-    # Setting the POST action
-    request = urllib2.Request(api_url + '/api/app?api_key=' + api_key)
-    request.add_data(data)
-    request.add_header('Content-type', 'application/json')
-
-    # Create the app in PyBOSSA
-    output = json.loads(urllib2.urlopen(request).read())
-    if (output['id'] != None):
-        print("Done!")
-        print("Ooooops! the name of the application has a typo!")
-        print("Updating it!")
-        if (update_app(api_url, api_key, output['id'],
-            "Flickr Person Finder")):
-            print "Application name fixed!"
-            return output['id']
-        else:
-            print "An error has occurred"
-    else:
-        print("Error creating the application")
-        return 0
-
-
-def create_task(api_url, api_key, app_id, n_answers, photo):
+def create_task(app_id, n_answers, photo):
     """
     Creates tasks for the application
 
     :arg integer app_id: Application ID in PyBossa.
-    :returns: Task ID in PyBossa.
-    :rtype: integer
+    :arg integer n_answers: Number of task runs or answers per task
+    :arg string photo: Photo URL
+    :returns: true -- status code from response
     """
-    # Data for the tasks
-    info = dict(question="Do you see a human in this photo?",
-                n_answers=int(n_answers), link=photo['link'],
-                url_m=photo['url_m'],
-                url_b=photo['url_b'])
-
-    data = dict(app_id=app_id, state=0, info=info,
-                 calibration=0, priority_0=0)
-
-    data = json.dumps(data)
-
-    # Setting the POST action
-    request = urllib2.Request(api_url + '/api/task' + '?api_key=' + api_key)
-    request.add_data(data)
-    request.add_header('Content-type', 'application/json')
-
-    # Create the task
-    output = json.loads(urllib2.urlopen(request).read())
-    if (output['id'] != None):
-        return True
-    else:
-        return False
-
-
-def update_template(api_url, api_key, app='flickrperson'):
-    """
-    Update tasks template and long description for the application flickrperson
-
-    :arg string app: Application short_name in PyBossa.
-    :returns: True when the template has been updated.
-    :rtype: boolean
-    """
-    request = urllib2.Request('%s/api/app?short_name=%s' %
-                              (api_url, app))
-    request.add_header('Content-type', 'application/json')
-
-    res = urllib2.urlopen(request).read()
-    res = json.loads(res)
-    res = res[0]
-    if res.get('short_name'):
-        # Re-read the template
-        file = open('template.html')
-        text = file.read()
-        file.close()
-        # Re-read the long_description
-        file = open('long_description.html')
-        long_desc = file.read()
-        file.close()
-        info = dict(thumbnail=res['info']['thumbnail'], task_presenter=text)
-        data = dict(id=res['id'], name=res['name'],
-                    short_name=res['short_name'],
-                    description=res['description'], hidden=res['hidden'],
-                    long_description=long_desc,
-                    info=info)
-        data = json.dumps(data)
-        request = urllib2.Request(api_url + '/api/app/' + str(res['id']) + \
-                                  '?api_key=' + api_key)
-        request.add_data(data)
-        request.add_header('Content-type', 'application/json')
-        request.get_method = lambda: 'PUT'
-
-        if (urllib2.urlopen(request).getcode() == 200):
-            return True
-        else:
-            return False
-
-    else:
-        return False
-
-    # Data for the tasks
-    info = dict(n_answers=2, link=photo['link'], url_m=photo['url_m'],
-                 url_b=photo['url_b'])
-    data = dict(app_id=app_id, state=0, info=info,
-                calibration=0, priority_0=0)
-    data = json.dumps(data)
-
-    # Setting the POST action
-    request = urllib2.Request(api_url + '/api/task' + '?api_key=' + api_key)
-    request.add_data(data)
-    request.add_header('Content-type', 'application/json')
-
-    # Create the task
-    output = json.loads(urllib2.urlopen(request).read())
-    if (output['id'] != None):
-        return True
-    else:
-        return False
-
-
-def update_tasks(api_url, api_key, app='flickrperson'):
-    """
-    Update tasks question
-
-    :arg string app: Application short_name in PyBossa.
-    :returns: True when the template has been updated.
-    :rtype: boolean
-    """
-    request = urllib2.Request('%s/api/app?short_name=%s' %
-                              (api_url, app))
-    request.add_header('Content-type', 'application/json')
-
-    res = urllib2.urlopen(request).read()
-    res = json.loads(res)
-    app = res[0]
-    if app.get('short_name'):
-        request = urllib2.Request('%s/api/task?app_id=%s&limit=%s' %
-                                  (api_url, app['id'], 1000))
-        request.add_header('Content-type', 'application/json')
-
-        res = urllib2.urlopen(request).read()
-        tasks = json.loads(res)
-
-        for t in tasks:
-            t['info']['question'] = u'Do you see a human in this photo?'
-            data = dict(info=t['info'], app_id=t['app_id'])
-            data = json.dumps(data)
-            request = urllib2.Request(api_url + '/api/task/' + str(t['id']) + \
-                                      '?api_key=' + api_key)
-            request.add_data(data)
-            request.add_header('Content-type', 'application/json')
-            request.get_method = lambda: 'PUT'
-
-            if (urllib2.urlopen(request).getcode() == 200):
-                print "Task ID: %s  updated" % t['id']
-            else:
-                return False
-
-    else:
-        return False
 
 
 def get_flickr_photos(size="big"):
@@ -355,54 +123,67 @@ if __name__ == "__main__":
 
     if not options.api_url:
         options.api_url = 'http://localhost:5000/'
+        pbclient.set('endpoint', options.api_url)
 
     if not options.api_key:
         parser.error("You must supply an API-KEY to create an \
                       applicationa and tasks in PyBossa")
+    else:
+        pbclient.set('api_key', options.api_key)
 
     if (options.verbose):
         print('Running against PyBosssa instance at: %s' % options.api_url)
         print('Using API-KEY: %s' % options.api_key)
 
+    if not options.n_answers:
+        options.n_answers = 30
+
     if options.create_app:
-        app_id = create_app(options.api_url, options.api_key)
+        pbclient.create_app('Flickr Person Finder',
+                'flickrperson',
+                'Do you see a human in this photo?')
+        app = pbclient.find_app(short_name='flickrperson')[0]
+        app.long_description = open('long_description.html').read()
+        app.info['task_presenter'] = open('template.html').read()
+        app.info['thumbnail'] = "http://img37.imageshack.us/img37/156/flickrpersonthumbnail.png"
+
+        pbclient.update_app(app)
         # First of all we get the URL photos
         photos = get_flickr_photos()
         # Finally, we have to create a set of tasks for the application
         # For this, we get first the photo URLs from Flickr
-        for photo in photos:
-            if options.n_answers:
-                create_task(options.api_url, options.api_key, app_id,
-                            options.n_answers, photo)
-            else:
-                create_task(options.api_url, options.api_key, app_id,
-                            30, photo)
+        for i in xrange(100):
+            for photo in photos:
+                # Data for the tasks
+                task_info = dict(question="Do you see a human in this photo?",
+                            n_answers=int(options.n_answers), link=photo['link'],
+                            url_m=photo['url_m'],
+                            url_b=photo['url_b'])
+                pbclient.create_task(app.id, task_info)
+
     else:
         if options.add_more_tasks:
-            request = urllib2.Request('%s/api/app?short_name=%s' %
-                                      (options.api_url, 'flickrperson'))
-            request.add_header('Content-type', 'application/json')
-
-            app = urllib2.urlopen(request).read()
-            app = json.loads(app)
-            app = app[0]
-            photos = get_flickr_photos()
             for photo in photos:
-                if options.n_answers:
-                    create_task(options.api_url, options.api_key, app['id'],
-                                options.n_answers, photo)
-                else:
-                    create_task(options.api_url, options.api_key, app['id'],
-                                30, photo)
+                task_info = dict(question="Do you see a human in this photo?",
+                            n_answers=int(options.n_answers), link=photo['link'],
+                            url_m=photo['url_m'],
+                            url_b=photo['url_b'])
+                pbclient.create_task(app.id, task_info)
 
     if options.update_template:
         print "Updating app template"
-        update_template(options.api_url, options.api_key)
+        app = pbclient.find_app(short_name='flickrperson')[0]
+        app.long_description = open('long_description.html').read()
+        app.info['task_presenter'] = open('template.html').read()
+        pbclient.update_app(app)
 
     if options.update_tasks:
         print "Updating task question"
-        update_tasks(options.api_url, options.api_key)
+        app = pbclient.find_app(short_name='flickrperson')[0]
+        for task in pbclient.get_tasks(app.id):
+            task.info['question'] = u'Ves un humano?'
+            pbclient.update_task(task)
 
     if not options.create_app and not options.update_template\
-            and not options.add_more_tasks:
+            and not options.add_more_tasks and not options.update_tasks:
         parser.error("Please check --help or -h for the available options")
