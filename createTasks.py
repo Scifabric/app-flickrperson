@@ -25,17 +25,6 @@ from optparse import OptionParser
 import pbclient
 
 
-def create_task(app_id, n_answers, photo):
-    """
-    Creates tasks for the application
-
-    :arg integer app_id: Application ID in PyBossa.
-    :arg integer n_answers: Number of task runs or answers per task
-    :arg string photo: Photo URL
-    :returns: true -- status code from response
-    """
-
-
 def get_flickr_photos(size="big"):
     """
     Gets public photos from Flickr feeds
@@ -123,7 +112,7 @@ if __name__ == "__main__":
 
     if not options.api_url:
         options.api_url = 'http://localhost:5000/'
-        pbclient.set('endpoint', options.api_url)
+    pbclient.set('endpoint', options.api_url)
 
     if not options.api_key:
         parser.error("You must supply an API-KEY to create an \
@@ -146,13 +135,14 @@ if __name__ == "__main__":
         app.long_description = open('long_description.html').read()
         app.info['task_presenter'] = open('template.html').read()
         app.info['thumbnail'] = "http://img37.imageshack.us/img37/156/flickrpersonthumbnail.png"
+        app.info['tutorial'] = open('tutorial.html').read()
 
         pbclient.update_app(app)
         # First of all we get the URL photos
         photos = get_flickr_photos()
         # Finally, we have to create a set of tasks for the application
         # For this, we get first the photo URLs from Flickr
-        for i in xrange(100):
+        for i in xrange(1):
             for photo in photos:
                 # Data for the tasks
                 task_info = dict(question="Do you see a human in this photo?",
@@ -175,6 +165,7 @@ if __name__ == "__main__":
         app = pbclient.find_app(short_name='flickrperson')[0]
         app.long_description = open('long_description.html').read()
         app.info['task_presenter'] = open('template.html').read()
+        app.info['tutorial'] = open('tutorial.html').read()
         pbclient.update_app(app)
 
     if options.update_tasks:
