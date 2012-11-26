@@ -24,7 +24,6 @@ import string
 from optparse import OptionParser
 import pbclient
 
-
 def get_flickr_photos(size="big"):
     """
     Gets public photos from Flickr feeds
@@ -110,6 +109,15 @@ if __name__ == "__main__":
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
     (options, args) = parser.parse_args()
 
+    # Load app details
+    try:
+        app_json = open('app.json')
+        app_config = json.load(app_json)
+        app_json.close()
+    except IOError as e:
+        print "app.json is missing! Please create a new one"
+        exit(0)
+
     if not options.api_url:
         options.api_url = 'http://localhost:5000/'
     pbclient.set('endpoint', options.api_url)
@@ -128,13 +136,13 @@ if __name__ == "__main__":
         options.n_answers = 30
 
     if options.create_app:
-        pbclient.create_app('Flickr Person Finder',
-                'flickrperson',
-                'Do you see a human in this photo?')
-        app = pbclient.find_app(short_name='flickrperson')[0]
+        pbclient.create_app(app_config['name'],
+                app_config['short_name'],
+                app_config['description'])
+        app = pbclient.find_app(short_name=app_config['short_name'])[0]
         app.long_description = open('long_description.html').read()
         app.info['task_presenter'] = open('template.html').read()
-        app.info['thumbnail'] = "http://img37.imageshack.us/img37/156/flickrpersonthumbnail.png"
+        app.info['thumbnail'] = app_config['thumbnail']
         app.info['tutorial'] = open('tutorial.html').read()
 
         pbclient.update_app(app)
@@ -145,7 +153,7 @@ if __name__ == "__main__":
         for i in xrange(1):
             for photo in photos:
                 # Data for the tasks
-                task_info = dict(question="Do you see a human in this photo?",
+                task_info = dict(question=app_config['question'],
                             n_answers=int(options.n_answers), link=photo['link'],
                             url_m=photo['url_m'],
                             url_b=photo['url_b'])
@@ -162,7 +170,7 @@ if __name__ == "__main__":
 
     if options.update_template:
         print "Updating app template"
-        app = pbclient.find_app(short_name='flickrperson')[0]
+        app = pbclient.find_app(short_name=app_config['short_name'])[0]
         app.long_description = open('long_description.html').read()
         app.info['task_presenter'] = open('template.html').read()
         app.info['tutorial'] = open('tutorial.html').read()
@@ -170,7 +178,7 @@ if __name__ == "__main__":
 
     if options.update_tasks:
         print "Updating task question"
-        app = pbclient.find_app(short_name='flickrperson')[0]
+        app = pbclient.find_app(short_name=app_config['short_name'])[0]
         for task in pbclient.get_tasks(app.id):
             task.info['question'] = u'Ves un humano?'
             pbclient.update_task(task)
