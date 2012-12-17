@@ -68,7 +68,7 @@ if __name__ == "__main__":
     usage = "usage: %prog [options]"
     parser = OptionParser(usage)
     # URL where PyBossa listens
-    parser.add_option("-u", "--url", dest="api_url",
+    parser.add_option("-s", "--server", dest="api_url",
                       help="PyBossa URL http://domain.com/", metavar="URL")
     # API-KEY
     parser.add_option("-k", "--api-key", dest="api_key",
