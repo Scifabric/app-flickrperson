@@ -161,6 +161,8 @@ if __name__ == "__main__":
 
     else:
         if options.add_more_tasks:
+            app = pbclient.find_app(short_name=app_config['short_name'])[0]
+            photos = get_flickr_photos()
             for photo in photos:
                 task_info = dict(question="Do you see a human in this photo?",
                             n_answers=int(options.n_answers), link=photo['link'],
