@@ -16,14 +16,14 @@
 
 var lt = []; // List of Task array: circular buffer with an index:
 var index = 0; // index for the buffer, it will show the next task
-var url = "http://pybossa.com/api/" // URL to query the PyBossa API
+var url = "http://crowdcrafting.org/api/" // URL to query the PyBossa API
 var xhr = $.getJSON(url + "app?short_name=flickrperson"); // In this case Flickr Person
 var app_id;
 
 // Get the application ID for loading the submitted tasks and results
 xhr.done( function( data ){
     app_id = data[0].id;
-    var tasks = $.getJSON(url + "task?app_id=" + app_id);
+    var tasks = $.getJSON(url + "task?app_id=" + app_id + "&limit=400");
     // Once all the tasks for this application have been loaded, create the
     // circular buffer
     tasks.done( function(data){
@@ -115,14 +115,14 @@ function create_arcs(formTaskId) {
     var img = $.getJSON(url + "task/" + taskId);
     img.done(function(data){
         // Load the _b size and not the _m size from Flickr
-        var url = data.info.url.replace("_m.jpg","_b.jpg");
-        $("#flickr").attr("src",url);
+        //var url = data.info.url_m.replace("_m.jpg","_b.jpg");
+        $("#flickr").attr("src",data.info.url_b);
     });
 
     // Get the answers for the task
-    var answers = $.getJSON(url + "taskrun?app_id=" + appId + "&task_id=" + taskId);
+    var answers = $.getJSON(url + "taskrun?app_id=" + appId + "&task_id=" + taskId +"&limit=100");
 
-    // When all the data has been retrieved, populate the chart
+    // When all the data have been retrieved, populate the chart
     answers.done( function ( data ){
         // Update the index to load the next task with the blue button
         index = index + 1;
@@ -135,7 +135,7 @@ function create_arcs(formTaskId) {
 
         // Compute the number of answers of Yes and No for the given task
         for (i=0;i<length;i++) {
-            if (data[i].info.answer == "Yes") {
+            if (data[i].info === "Yes") {
                 tmp[0] = tmp[0] + 1;
             }
             else {
