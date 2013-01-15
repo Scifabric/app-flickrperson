@@ -1,7 +1,7 @@
 {
     "name": "Flickr Person Finder",
     "short_name": "flickrperson",
-    "thumbnail": "http://img37.imageshack.us/img37/156/flickrpersonthumbnail.png",
+    "thumbnail": "http://imageshack.us/a/img37/156/flickrpersonthumbnail.png",
     "description": "Image pattern recognition",
     "question": "Do you see a human in this photo?"
 }

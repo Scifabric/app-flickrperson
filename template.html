@@ -1,16 +1,3 @@
-<style type="text/css">
-    #throbber {
-        padding: 10px;
-        position:absolute;
-        left: 45%;
-        top:45%;
-        margin: -50px 0 0 -50px;
-        z-index: 10000;
-        width: 100px;
-        height: 100px;
-    }
-</style>
-
 <div class="row">
     <!-- Success and Error Messages for the user --> 
     <!-- Question, task id, photo and action buttons for answering the question-->
@@ -19,6 +6,11 @@
             <a class="close">×</a>
             <strong>Well done!</strong> Your answer has been saved</strong>
     </div>
+    <div id="loading" class="alert alert-info" style="display:none;">
+            <a class="close">×</a>
+            Loading next task...
+    </div>
+
     <div id="taskcompleted" class="alert alert-info" style="display:none;">
         <strong>The task has been completed!</strong> Thanks a lot!</strong>
 </div>
@@ -39,131 +31,137 @@
 </div>
 
 
-<div id="throbber"></div>
-
 <div class="row skeleton">
-  <div id="question" class="span6 offset2">
-      <h2>Question</h2>
-      <p>You are working now on task: <span id="task-id" class="label label-warning">#</span></p>
-  </div>
-</div>
 
-<div class="row skeleton">
-    <div class="span6 offset2">
+    <div class="span6 ">
+        <h1 id="question">Question</h1>
+      <div id="answer">
+          <button class="btn btn-success btn-answer" value='Yes'><i class="icon icon-white icon-thumbs-up"></i> Yes</button>
+          <button class="btn btn-danger btn-answer" value='No'><i class="icon icon-white icon-thumbs-down"></i> No</button>
+          <button class="btn btn-answer" value='NotKnown'><i class="icon icon-white icon-question-sign"></i> I don't know</button>
+      </div>
+        <p>You are working now on task: <span id="task-id" class="label label-warning">#</span></p>
         <p>You have completed: <span id="done" class="label label-info"></span> tasks from
         <span id="total" class="label label-inverse"></span></p>
         <div class="progress progress-striped">
             <div id="progress" rel="tooltip" title="#" class="bar" style="width: 0%;"></div>
         </div>
+        <div id="disqus_show_btn" style="margin-top:5px;">
+            <button class="btn btn-primary btn-large btn-disqus" onclick="loadDisqus()"><i class="icon-comments"></i> Show comments</button>
+            <button class="btn btn-large btn-disqus" onclick="loadDisqus()" style="display:none"><i class="icon-comments"></i> Hide comments</button>
+        </div>
+        <div id="disqus_thread" style="margin-top:5px;display:none"></div>
     </div>
+  <div class="span6">
+      <a id="photo-link" href="#">
+        <img id="photo" src="http://img339.imageshack.us/img339/9017/loadingo.png" style="max-width=100%">
+      </a>
+  </div>
 </div>
 
 <div class="row skeleton" style="text-align:center">
       <!-- Answer buttons -->
-      <div id="answer" class="span6 offset2">
-          <button class="btn btn-large btn-success" onclick="submitTask('Yes')"><i class="icon icon-white icon-thumbs-up"></i> Yes</button>
-          <button class="btn btn-large btn-danger" onclick="submitTask('No')"><i class="icon icon-white icon-thumbs-down"></i> No</button>
-          <button class="btn btn-large" onclick="submitTask('NotKnown')"><i class="icon icon-white icon-question-sign"></i> I don't know</button>
-      </div>
 </div>
 
 <div class="row skeleton" style="padding-top:10px;">
   <div class="span6 offset2">
-    <a id="photo-link" href="#">
-      <img id="photo" src="http://img339.imageshack.us/img339/9017/loadingo.png" onload="spinnerStop()" style="max-width=100%">
-    </a>
   </div>
 </div>
 
 <div class="row skeleton">
-<div id="disqus_thread" class="span6 offset2"></div>
 </div>
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-    var disqus_shortname = 'pybossa'; // required: replace example with your forum shortname
-    //var disqus_developer = 1;
 
     /* * * DON'T EDIT BELOW THIS LINE * * */
+    function loadDisqus() {
+    $("#disqus_thread").toggle();
+    $(".btn-disqus").toggle();
+    var disqus_shortname = 'pybossa'; // required: replace example with your forum shortname
+    //var disqus_identifier = taskId;
+    var disqus_developer = 1;
+
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();
+    }
+
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
 <script src="/static/js/pybossa/pybossa.js" type="text/javascript"></script>
 <script src="/static/js/throbber/throbber.js" type="text/javascript"></script>
 <script>
-var spinner = new Throbber({
-    color: 'black',
-    size: 90
-});
-
-// The spinner is attached to a div overlayed in top of the photo. 
-// This div is only shown when the spinner is active, 
-// otherwise, the div is hidden from the view to show the photo.¬
-
-spinner.appendTo (document.getElementById('throbber'));
-
-// This function shows the spinner div and starts its animation¬
-function spinnerStart() {
-    $("#throbber").show();
-    spinner.start();
-    console.log("Spinner started!");
-}
-
-// This function stops the spinner and hides the spinner div¬
-function spinnerStop() {
-    spinner.stop()
-    $("#throbber").hide();
-    console.log("Spinner stopped!");
-}
-// Function to load the TaskRun data into the HTML skeleton
-function loadData( data ) {
-    // Uncomment next line for debugging purposes
-    //console.log( data );
-    if ( !$.isEmptyObject(data.task) ) {
-        spinnerStart();
-        $("#question h2").text(data.question);
-        $("#task-id").text(data.task.id);
-        $("#photo-link").attr("href", data.task.info.link);
-        $("#photo").attr("src",data.task.info.url_m);
-    }
-    else {
-        $(".skeleton").hide();
-        $("#finish").fadeIn();
-    }
-}
-
-function loadTask( task_id ) {
-    // Uncomment next line for debugging purposes
-    //console.log( data );
-    var t = $.ajax({
-        url: '/api/task/'+task_id,
-        dataType: 'json'
-    });
-    t.done( function (task) {
-        if ( !$.isEmptyObject(task) ) {
-            spinnerStart();
-            if (task.state=='completed') {
-                $('#answer').hide();
-                $('#disqus_thread').hide();
-                $('#taskcompleted').show();
-            }
-            loadUserProgress();
-            $("#question h2").text(task.info.question);
-            $("#task-id").text(task.id);
-            $("#photo-link").attr("href", task.info.link);
-            $("#photo").attr("src", task.info.url_b);
-        }
-        else {
-            $(".skeleton").hide();
-            $("#finish").fadeIn();
-        }
-    });
-}
+//var spinner = new Throbber({
+//    color: 'black',
+//    size: 90
+//});
+//
+//// The spinner is attached to a div overlayed in top of the photo. 
+//// This div is only shown when the spinner is active, 
+//// otherwise, the div is hidden from the view to show the photo.¬
+//
+//spinner.appendTo (document.getElementById('throbber'));
+//
+//// This function shows the spinner div and starts its animation¬
+//function spinnerStart() {
+//    $("#throbber").show();
+//    spinner.start();
+//    console.log("Spinner started!");
+//}
+//
+//// This function stops the spinner and hides the spinner div¬
+//function spinnerStop() {
+//    spinner.stop()
+//    $("#throbber").hide();
+//    console.log("Spinner stopped!");
+//}
+//// Function to load the TaskRun data into the HTML skeleton
+//function loadData( data ) {
+//    // Uncomment next line for debugging purposes
+//    //console.log( data );
+//    if ( !$.isEmptyObject(data.task) ) {
+//        spinnerStart();
+//        $("#question h2").text(data.question);
+//        $("#task-id").text(data.task.id);
+//        $("#photo-link").attr("href", data.task.info.link);
+//        $("#photo").attr("src",data.task.info.url_m);
+//    }
+//    else {
+//        $(".skeleton").hide();
+//        $("#finish").fadeIn();
+//    }
+//}
+//
+//function loadTask( task_id ) {
+//    // Uncomment next line for debugging purposes
+//    //console.log( data );
+//    var t = $.ajax({
+//        url: '/api/task/'+task_id,
+//        dataType: 'json'
+//    });
+//    t.done( function (task) {
+//        if ( !$.isEmptyObject(task) ) {
+//            spinnerStart();
+//            if (task.state=='completed') {
+//                $('#answer').hide();
+//                $('#disqus_thread').hide();
+//                $('#taskcompleted').show();
+//            }
+//            loadUserProgress();
+//            $("#question h2").text(task.info.question);
+//            $("#task-id").text(task.id);
+//            $("#photo-link").attr("href", task.info.link);
+//            $("#photo").attr("src", task.info.url_b);
+//        }
+//        else {
+//            $(".skeleton").hide();
+//            $("#finish").fadeIn();
+//        }
+//    });
+//}
 
 function loadUserProgress() {
     pybossa.userProgress('flickrperson').done(function(data){
@@ -177,40 +175,68 @@ function loadUserProgress() {
 }
 
 // Function to submit and save the TaskRun in PyBossa
-function submitTask(answer) {
-    // Get the task-id
-    var taskid = $("#task-id").text();
-    // Save the task
-    pybossa.saveTask(taskid, answer).done( function( data ) {
-        // Uncoment next line for debugging purposes
-        //console.log("Answer saved!");
-        // FadeIn & Out the success div feedback
-        $("#success").fadeIn();
-        setTimeout(function() { $("#success").fadeOut() }, 2000);
-        // Load a new task
-        //pybossa.newTask("flickrperson").done( function( data ){ loadData( data ) });
-        window.location.pathname = "/app/flickrperson/newtask";
-    });
-}
+//function submitTask(answer) {
+//    // Get the task-id
+//    var taskid = $("#task-id").text();
+//    // Save the task
+//    pybossa.saveTask(taskid, answer).done( function( data ) {
+//        // Uncoment next line for debugging purposes
+//        //console.log("Answer saved!");
+//        // FadeIn & Out the success div feedback
+//        $("#success").fadeIn();
+//        setTimeout(function() { $("#success").fadeOut() }, 2000);
+//        // Load a new task
+//        //pybossa.newTask("flickrperson").done( function( data ){ loadData( data ) });
+//        window.location.pathname = "/app/flickrperson/newtask";
+//    });
+//}
 
-// Check if the user is loading directly a task or requesting a new one
-var taskId = pybossa.getCurrentTaskId(window.location.pathname);
+pybossa.taskLoaded(function(task, deferred) {
+    if ( !$.isEmptyObject(task) ) {
+        // load image from flickr
+        var img = $('<img />');
+        img.load(function() {
+            // continue as soon the image is loaded
+            deferred.resolve(task);
+        });
+        img.attr('src', task.info.url_b).css('height', 460);
+        img.addClass('img-polaroid');
+        task.info.image = img;
+    }
+    else {
+        deferred.resolve(task);
+    }
+});
 
-if (taskId){
-    // The user is loading directly a task, so load then input data
-    loadTask(taskId);
-}
-else {
-    // The user is requesting a new task, so get a new one
-    pybossa.newTask("flickrperson").done( function( data ) { 
+pybossa.presentTask(function(task, deferred) {
+    if ( !$.isEmptyObject(task) ) {
+        loadUserProgress();
+        $('#photo-link').html('').append(task.info.image);
+        $("#photo-link").attr("href", task.info.link);
+        $("#question").html(task.info.question);
+        $('#task-id').html(task.id);
+        //loadDisqus();
+        $('.btn-answer').off('click').on('click', function(evt) {
+            var answer = $(evt.target).attr("value");
+            if (typeof answer != 'undefined') {
+                console.log(answer);
+                pybossa.saveTask(task.id, answer).done(function() {
+                    deferred.resolve();
+                });
+                $("#loading").fadeIn(500);
+            }
+            else {
+                $("#error").show();
+            }
+        });
+        $("#loading").hide();
+    }
+    else {
+        $(".skeleton").hide();
+        $("#loading").hide();
+        $("#finish").fadeIn(500);
+    }
+});
 
-        if ( !$.isEmptyObject(data.task) ) {
-            window.location.pathname = "/app/flickrperson/task/" + data.task.id;
-        }
-        else {
-            $(".skeleton").hide();
-            $("#finish").fadeIn();
-        }
-    });
-}
+pybossa.run('flickrperson');
 </script>

@@ -176,6 +176,7 @@ if __name__ == "__main__":
         app.long_description = open('long_description.html').read()
         app.info['task_presenter'] = open('template.html').read()
         app.info['tutorial'] = open('tutorial.html').read()
+        app.info['thumbnail'] = app_config['thumbnail']
         pbclient.update_app(app)
 
     if options.update_tasks:
