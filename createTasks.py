@@ -25,7 +25,7 @@ from get_images import get_flickr_photos
 def contents(filename):
     return file(filename).read()
 
-if __name__ == "__main__":
+def handle_arguments():
     # Arguments for the application
     usage = "usage: %prog [options]"
     parser = OptionParser(usage)
@@ -85,6 +85,11 @@ if __name__ == "__main__":
     if not options.api_key:
         parser.error("You must supply an API-KEY to create an \
                       application and tasks in PyBossa")
+
+    return options
+
+def run():
+    options = handle_arguments()
 
     # Load app details
     try:
@@ -165,3 +170,6 @@ if __name__ == "__main__":
             offset = (offset + limit)
             tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
         print "%s Tasks have been updated!" % n_tasks
+
+if __name__ == "__main__":
+    run()
