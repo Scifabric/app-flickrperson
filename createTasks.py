@@ -88,7 +88,7 @@ def handle_arguments():
 
     return options
 
-def configuration():
+def get_configuration():
     options = handle_arguments()
 
     # Load app details
