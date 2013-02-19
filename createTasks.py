@@ -99,17 +99,25 @@ if __name__ == "__main__":
         print('Running against PyBosssa instance at: %s' % options.api_url)
         print('Using API-KEY: %s' % options.api_key)
 
-    if options.create_app:
-        pbclient.create_app(app_config['name'],
-                app_config['short_name'],
-                app_config['description'])
-        app = pbclient.find_app(short_name=app_config['short_name'])[0]
+    def find_app_by_short_name():
+        return pbclient.find_add(short_name=app_config['short_name'])[0]        
+        
+    def setup_app():
+        app = find_app_by_short_name()
         app.long_description = contents('long_description.html')
         app.info['task_presenter'] = contents('template.html')
         app.info['thumbnail'] = app_config['thumbnail']
         app.info['tutorial'] = contents('tutorial.html')
 
         pbclient.update_app(app)
+        return app
+
+    if options.create_app:
+        pbclient.create_app(app_config['name'],
+                app_config['short_name'],
+                app_config['description'])
+        app = setup_app()
+
         # First of all we get the URL photos
         photos = get_flickr_photos()
         # Finally, we have to create a set of tasks for the application
@@ -125,7 +133,8 @@ if __name__ == "__main__":
 
     else:
         if options.add_more_tasks:
-            app = pbclient.find_app(short_name=app_config['short_name'])[0]
+
+            app = find_app_by_short_name()
             photos = get_flickr_photos()
             for photo in photos:
                 task_info = dict(question="Do you see a human in this photo?",
@@ -136,16 +145,11 @@ if __name__ == "__main__":
 
     if options.update_template:
         print "Updating app template"
-        app = pbclient.find_app(short_name=app_config['short_name'])[0]
-        app.long_description = contents('long_description.html')
-        app.info['task_presenter'] = contents('template.html')
-        app.info['tutorial'] = contents('tutorial.html')
-        app.info['thumbnail'] = app_config['thumbnail']
-        pbclient.update_app(app)
+        setup_app() # discard return value
 
     if options.update_tasks:
         print "Updating task n_answers"
-        app = pbclient.find_app(short_name=app_config['short_name'])[0]
+        app = find_app_by_short_name()
         n_tasks = 0
         offset = 0
         limit = 100
