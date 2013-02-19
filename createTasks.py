@@ -84,7 +84,6 @@ if __name__ == "__main__":
     if not options.api_key:
         parser.error("You must supply an API-KEY to create an \
                       application and tasks in PyBossa")
-    pbclient.set('api_key', options.api_key)
 
     # Load app details
     try:
@@ -94,6 +93,7 @@ if __name__ == "__main__":
         print "application config file is missing! Please create a new one"
         exit(1)
 
+    pbclient.set('api_key', options.api_key)
     pbclient.set('endpoint', options.api_url)
 
     if options.verbose:
