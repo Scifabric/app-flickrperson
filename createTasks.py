@@ -88,7 +88,7 @@ def handle_arguments():
 
     return options
 
-def run():
+def configuration():
     options = handle_arguments()
 
     # Load app details
@@ -99,6 +99,9 @@ def run():
         print "application config file is missing! Please create a new one"
         exit(1)
 
+    return (app_config, options)
+
+def run(app_config, options):
     pbclient.set('api_key', options.api_key)
     pbclient.set('endpoint', options.api_url)
 
@@ -172,4 +175,5 @@ def run():
         print "%s Tasks have been updated!" % n_tasks
 
 if __name__ == "__main__":
-    run()
+    app_config, options = get_configuration()
+    run(app_config, options)
