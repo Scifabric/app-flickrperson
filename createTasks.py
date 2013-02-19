@@ -27,7 +27,8 @@ if __name__ == "__main__":
     parser = OptionParser(usage)
     # URL where PyBossa listens
     parser.add_option("-s", "--server", dest="api_url",
-                      help="PyBossa URL http://domain.com/", metavar="URL")
+                      help="PyBossa URL http://domain.com/", metavar="URL",
+                      default="http://localhost:5000/")
     # API-KEY
     parser.add_option("-k", "--api-key", dest="api_key",
                       help="PyBossa User API-KEY to interact with PyBossa",
@@ -76,8 +77,6 @@ if __name__ == "__main__":
         print "app.json is missing! Please create a new one"
         exit(0)
 
-    if not options.api_url:
-        options.api_url = 'http://localhost:5000/'
     pbclient.set('endpoint', options.api_url)
 
     if not options.api_key:
