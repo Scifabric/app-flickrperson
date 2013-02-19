@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     if not options.api_key:
         parser.error("You must supply an API-KEY to create an \
-                      applicationa and tasks in PyBossa")
+                      application and tasks in PyBossa")
     pbclient.set('api_key', options.api_key)
 
     # Load app details
