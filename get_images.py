@@ -21,6 +21,7 @@ import re
 import json
 import string
 
+
 def get_flickr_photos(size="big"):
     """
     Gets public photos from Flickr feeds
@@ -29,13 +30,13 @@ def get_flickr_photos(size="big"):
     :rtype: list
     """
     # Get the ID of the photos and load it in the output var
+    # add the 'ids': '25053835@N03' to the values dict if you want to
+    # specify a Flickr Person ID
     print('Contacting Flickr for photos')
     url = "http://api.flickr.com/services/feeds/photos_public.gne"
-    values = {
-        'nojsoncallback': 1,
-        'format': "json",
-        #'ids':'25053835@N03'
-        }
+    values = {'nojsoncallback': 1,
+              'format': "json"}
+
     query = url + "?" + urllib.urlencode(values)
     urlobj = urllib2.urlopen(query)
     data = urlobj.read()

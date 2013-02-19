@@ -21,7 +21,9 @@ from optparse import OptionParser
 import pbclient
 from get_images import get_flickr_photos
 
-def contents(filename): return file(filename).read()
+
+def contents(filename):
+    return file(filename).read()
 
 if __name__ == "__main__":
     # Arguments for the application
@@ -44,21 +46,19 @@ if __name__ == "__main__":
     parser.add_option("-t", "--update-template", action="store_true",
                       dest="update_template",
                       help="Update Tasks template",
-                      metavar="UPDATE-TEMPLATE"
-                     )
+                      metavar="UPDATE-TEMPLATE")
 
     # Update tasks question
     parser.add_option("-q", "--update-tasks",
                       dest="update_tasks",
                       help="Update Tasks n_answers",
-                      metavar="UPDATE-TASKS"
-                     )
+                      metavar="UPDATE-TASKS")
 
     parser.add_option("-x", "--extra-task", action="store_true",
                       dest="add_more_tasks",
                       help="Add more tasks",
-                      metavar="ADD-MORE-TASKS"
-                      )
+                      metavar="ADD-MORE-TASKS")
+
     # Modify the number of TaskRuns per Task
     # (default 30)
     parser.add_option("-n", "--number-answers",
@@ -66,15 +66,13 @@ if __name__ == "__main__":
                       dest="n_answers",
                       help="Number of answers per task",
                       metavar="N-ANSWERS",
-                      default=30
-                     )
+                      default=30)
 
-    parser.add_option("-a", "--application-config", 
+    parser.add_option("-a", "--application-config",
                       dest="app_config",
                       help="Application config file",
                       metavar="APP-CONFIG",
-                      default="app.json"
-                      )
+                      default="app.json")
 
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
     (options, args) = parser.parse_args()
@@ -100,8 +98,8 @@ if __name__ == "__main__":
         print('Using API-KEY: %s' % options.api_key)
 
     def find_app_by_short_name():
-        return pbclient.find_app(short_name=app_config['short_name'])[0]        
-        
+        return pbclient.find_app(short_name=app_config['short_name'])[0]
+
     def setup_app():
         app = find_app_by_short_name()
         app.long_description = contents('long_description.html')
@@ -123,8 +121,9 @@ if __name__ == "__main__":
 
     if options.create_app:
         pbclient.create_app(app_config['name'],
-                app_config['short_name'],
-                app_config['description'])
+                            app_config['short_name'],
+                            app_config['description'])
+
         app = setup_app()
 
         # First of all we get the URL photos
@@ -133,19 +132,21 @@ if __name__ == "__main__":
 
         photos = get_flickr_photos()
         question = app_config['question']
+        # Batch creation
         for i in xrange(1):
-            [ create_photo_task(app, p, question) for p in photos ]
+            [create_photo_task(app, p, question) for p in photos]
     else:
         if options.add_more_tasks:
 
             app = find_app_by_short_name()
             photos = get_flickr_photos()
             question = "Do you see a human in this photo?"
-            [ create_photo_task(app, p, question) for p in photos ]
+            [create_photo_task(app, p, question) for p in photos]
 
     if options.update_template:
         print "Updating app template"
-        setup_app() # discard return value
+        # discard return value
+        setup_app()
 
     if options.update_tasks:
         print "Updating task n_answers"
@@ -153,7 +154,7 @@ if __name__ == "__main__":
         n_tasks = 0
         offset = 0
         limit = 100
-        tasks = pbclient.get_tasks(app.id,offset=offset,limit=limit)
+        tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
         while tasks:
             for task in tasks:
                 print "Updating task: %s" % task.id
@@ -163,7 +164,7 @@ if __name__ == "__main__":
                 pbclient.update_task(task)
                 n_tasks += 1
             offset = (offset + limit)
-            tasks = pbclient.get_tasks(app.id,offset=offset,limit=limit)
+            tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
         print "%s Tasks have been updated!" % n_tasks
 
     if not options.create_app and not options.update_template\
