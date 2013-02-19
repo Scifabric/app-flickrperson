@@ -95,7 +95,7 @@ if __name__ == "__main__":
     else:
         pbclient.set('api_key', options.api_key)
 
-    if (options.verbose):
+    if options.verbose:
         print('Running against PyBosssa instance at: %s' % options.api_url)
         print('Using API-KEY: %s' % options.api_key)
 
