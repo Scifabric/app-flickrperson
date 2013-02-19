@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     # Load app details
     try:
-        app_json = open(options.app_config)
+        app_json = file(options.app_config)
         app_config = json.load(app_json)
         app_json.close()
     except IOError as e:
@@ -103,10 +103,10 @@ if __name__ == "__main__":
                 app_config['short_name'],
                 app_config['description'])
         app = pbclient.find_app(short_name=app_config['short_name'])[0]
-        app.long_description = open('long_description.html').read()
-        app.info['task_presenter'] = open('template.html').read()
+        app.long_description = file('long_description.html').read()
+        app.info['task_presenter'] = file('template.html').read()
         app.info['thumbnail'] = app_config['thumbnail']
-        app.info['tutorial'] = open('tutorial.html').read()
+        app.info['tutorial'] = file('tutorial.html').read()
 
         pbclient.update_app(app)
         # First of all we get the URL photos
@@ -136,9 +136,9 @@ if __name__ == "__main__":
     if options.update_template:
         print "Updating app template"
         app = pbclient.find_app(short_name=app_config['short_name'])[0]
-        app.long_description = open('long_description.html').read()
-        app.info['task_presenter'] = open('template.html').read()
-        app.info['tutorial'] = open('tutorial.html').read()
+        app.long_description = file('long_description.html').read()
+        app.info['task_presenter'] = file('template.html').read()
+        app.info['tutorial'] = file('tutorial.html').read()
         app.info['thumbnail'] = app_config['thumbnail']
         pbclient.update_app(app)
 
