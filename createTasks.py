@@ -135,7 +135,6 @@ if __name__ == "__main__":
 
         photos = get_flickr_photos()
         question = app_config['question']
-        # Batch creation
         for i in xrange(1):
             [create_photo_task(app, p, question) for p in photos]
     else:
@@ -143,7 +142,7 @@ if __name__ == "__main__":
 
             app = find_app_by_short_name()
             photos = get_flickr_photos()
-            question = "Do you see a human in this photo?"
+            question = app_config['question']
             [create_photo_task(app, p, question) for p in photos]
 
     if options.update_template:
