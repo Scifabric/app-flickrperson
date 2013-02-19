@@ -130,17 +130,16 @@ if __name__ == "__main__":
         question = app_config['question']
         [create_photo_task(app, p, question) for p in photos]
 
-    if options.create_app:
-        pbclient.create_app(app_config['name'],
-                            app_config['short_name'],
-                            app_config['description'])
+    if options.create_app or options.add_more_tasks:
+        if options.create_app:
+            pbclient.create_app(app_config['name'],
+                                app_config['short_name'],
+                                app_config['description'])
 
-        app = setup_app()
-        add_photo_tasks(app)
-    else:
-        if options.add_more_tasks:
+            app = setup_app()
+        else:
             app = find_app_by_short_name()
-            add_photo_tasks(app)
+        add_photo_tasks(app)
 
     if options.update_template:
         print "Updating app template"
