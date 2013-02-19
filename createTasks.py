@@ -50,6 +50,7 @@ if __name__ == "__main__":
 
     # Update tasks question
     parser.add_option("-q", "--update-tasks",
+                      type="int",
                       dest="update_tasks",
                       help="Update Tasks n_answers",
                       metavar="UPDATE-TASKS")
@@ -158,7 +159,7 @@ if __name__ == "__main__":
                 print "Updating task: %s" % task.id
                 if ('n_answers' in task.info.keys()):
                     del(task.info['n_answers'])
-                task.n_answers = int(options.update_tasks)
+                task.n_answers = options.update_tasks
                 pbclient.update_task(task)
                 n_tasks += 1
             offset = (offset + limit)
