@@ -165,7 +165,7 @@ def run(app_config, options):
         while tasks:
             for task in tasks:
                 print "Updating task: %s" % task.id
-                if ('n_answers' in task.info.keys()):
+                if 'n_answers' in task.info:
                     del(task.info['n_answers'])
                 task.n_answers = options.update_tasks
                 pbclient.update_task(task)
