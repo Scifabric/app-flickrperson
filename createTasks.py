@@ -60,9 +60,11 @@ if __name__ == "__main__":
     # Modify the number of TaskRuns per Task
     # (default 30)
     parser.add_option("-n", "--number-answers",
+                      type="int",
                       dest="n_answers",
                       help="Number of answers per task",
-                      metavar="N-ANSWERS"
+                      metavar="N-ANSWERS",
+                      default=30
                      )
 
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
@@ -89,9 +91,6 @@ if __name__ == "__main__":
         print('Running against PyBosssa instance at: %s' % options.api_url)
         print('Using API-KEY: %s' % options.api_key)
 
-    if not options.n_answers:
-        options.n_answers = 30
-
     if options.create_app:
         pbclient.create_app(app_config['name'],
                 app_config['short_name'],
@@ -111,7 +110,7 @@ if __name__ == "__main__":
             for photo in photos:
                 # Data for the tasks
                 task_info = dict(question=app_config['question'],
-                            n_answers=int(options.n_answers), link=photo['link'],
+                            n_answers=options.n_answers, link=photo['link'],
                             url_m=photo['url_m'],
                             url_b=photo['url_b'])
                 pbclient.create_task(app.id, task_info)
@@ -122,7 +121,7 @@ if __name__ == "__main__":
             photos = get_flickr_photos()
             for photo in photos:
                 task_info = dict(question="Do you see a human in this photo?",
-                            n_answers=int(options.n_answers), link=photo['link'],
+                            n_answers=options.n_answers, link=photo['link'],
                             url_m=photo['url_m'],
                             url_b=photo['url_b'])
                 pbclient.create_task(app.id, task_info)
