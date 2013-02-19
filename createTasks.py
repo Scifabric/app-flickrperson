@@ -135,8 +135,7 @@ if __name__ == "__main__":
 
         photos = get_flickr_photos()
         question = app_config['question']
-        for i in xrange(1):
-            [create_photo_task(app, p, question) for p in photos]
+        [create_photo_task(app, p, question) for p in photos]
     else:
         if options.add_more_tasks:
 
