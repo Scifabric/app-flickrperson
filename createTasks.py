@@ -67,16 +67,23 @@ if __name__ == "__main__":
                       default=30
                      )
 
+    parser.add_option("-a", "--application-config", 
+                      dest="app_config",
+                      help="Application config file",
+                      metavar="APP-CONFIG",
+                      default="app.json"
+                      )
+
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
     (options, args) = parser.parse_args()
 
     # Load app details
     try:
-        app_json = open('app.json')
+        app_json = open(options.app_config)
         app_config = json.load(app_json)
         app_json.close()
     except IOError as e:
-        print "app.json is missing! Please create a new one"
+        print "application config file is missing! Please create a new one"
         exit(0)
 
     pbclient.set('endpoint', options.api_url)
