@@ -77,6 +77,10 @@ if __name__ == "__main__":
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
     (options, args) = parser.parse_args()
 
+    if not options.create_app and not options.update_template\
+            and not options.add_more_tasks and not options.update_tasks:
+        parser.error("Please check --help or -h for the available options")
+
     # Load app details
     try:
         with file(options.app_config) as app_json:
@@ -166,7 +170,3 @@ if __name__ == "__main__":
             offset = (offset + limit)
             tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
         print "%s Tasks have been updated!" % n_tasks
-
-    if not options.create_app and not options.update_template\
-            and not options.add_more_tasks and not options.update_tasks:
-        parser.error("Please check --help or -h for the available options")
