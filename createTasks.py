@@ -100,7 +100,7 @@ if __name__ == "__main__":
         print('Using API-KEY: %s' % options.api_key)
 
     def find_app_by_short_name():
-        return pbclient.find_add(short_name=app_config['short_name'])[0]        
+        return pbclient.find_app(short_name=app_config['short_name'])[0]        
         
     def setup_app():
         app = find_app_by_short_name()
