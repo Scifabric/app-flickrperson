@@ -16,52 +16,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with PyBOSSA.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib
-import urllib2
 import json
-import re
-import string
 from optparse import OptionParser
 import pbclient
+from get_images import get_flickr_photos
 
-def get_flickr_photos(size="big"):
-    """
-    Gets public photos from Flickr feeds
-    :arg string size: Size of the image from Flickr feed.
-    :returns: A list of photos.
-    :rtype: list
-    """
-    # Get the ID of the photos and load it in the output var
-    print('Contacting Flickr for photos')
-    url = "http://api.flickr.com/services/feeds/photos_public.gne"
-    values = {
-        'nojsoncallback': 1,
-        'format': "json",
-        #'ids':'25053835@N03'
-        }
-    query = url + "?" + urllib.urlencode(values)
-    urlobj = urllib2.urlopen(query)
-    data = urlobj.read()
-    urlobj.close()
-    # The returned JSON object by Flickr is not correctly escaped,
-    # so we have to fix it see
-    # http://goo.gl/A9VNo
-    regex = re.compile(r'\\(?![/u"])')
-    fixed = regex.sub(r"\\\\", data)
-    output = json.loads(fixed)
-    print('Data retrieved from Flickr')
-
-    # For each photo ID create its direct URL according to its size:
-    # big, medium, small (or thumbnail) + Flickr page hosting the photo
-    photos = []
-    for idx, photo in enumerate(output['items']):
-        print 'Retrieved photo: %s' % idx
-        imgUrl_m = photo["media"]["m"]
-        imgUrl_b = string.replace(photo["media"]["m"], "_m.jpg", "_b.jpg")
-        photos.append({'link': photo["link"], 'url_m':  imgUrl_m,
-                       'url_b': imgUrl_b})
-    return photos
-
+def contents(filename): return file(filename).read()
 
 if __name__ == "__main__":
     # Arguments for the application
@@ -69,7 +29,8 @@ if __name__ == "__main__":
     parser = OptionParser(usage)
     # URL where PyBossa listens
     parser.add_option("-s", "--server", dest="api_url",
-                      help="PyBossa URL http://domain.com/", metavar="URL")
+                      help="PyBossa URL http://domain.com/", metavar="URL",
+                      default="http://localhost:5000/")
     # API-KEY
     parser.add_option("-k", "--api-key", dest="api_key",
                       help="PyBossa User API-KEY to interact with PyBossa",
@@ -101,25 +62,31 @@ if __name__ == "__main__":
     # Modify the number of TaskRuns per Task
     # (default 30)
     parser.add_option("-n", "--number-answers",
+                      type="int",
                       dest="n_answers",
                       help="Number of answers per task",
-                      metavar="N-ANSWERS"
+                      metavar="N-ANSWERS",
+                      default=30
                      )
+
+    parser.add_option("-a", "--application-config", 
+                      dest="app_config",
+                      help="Application config file",
+                      metavar="APP-CONFIG",
+                      default="app.json"
+                      )
 
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose")
     (options, args) = parser.parse_args()
 
     # Load app details
     try:
-        app_json = open('app.json')
-        app_config = json.load(app_json)
-        app_json.close()
+        with file(options.app_config) as app_json:
+            app_config = json.load(app_json)
     except IOError as e:
-        print "app.json is missing! Please create a new one"
-        exit(0)
+        print "application config file is missing! Please create a new one"
+        exit(1)
 
-    if not options.api_url:
-        options.api_url = 'http://localhost:5000/'
     pbclient.set('endpoint', options.api_url)
 
     if not options.api_key:
@@ -128,60 +95,61 @@ if __name__ == "__main__":
     else:
         pbclient.set('api_key', options.api_key)
 
-    if (options.verbose):
+    if options.verbose:
         print('Running against PyBosssa instance at: %s' % options.api_url)
         print('Using API-KEY: %s' % options.api_key)
 
-    if not options.n_answers:
-        options.n_answers = 30
+    def find_app_by_short_name():
+        return pbclient.find_app(short_name=app_config['short_name'])[0]        
+        
+    def setup_app():
+        app = find_app_by_short_name()
+        app.long_description = contents('long_description.html')
+        app.info['task_presenter'] = contents('template.html')
+        app.info['thumbnail'] = app_config['thumbnail']
+        app.info['tutorial'] = contents('tutorial.html')
+
+        pbclient.update_app(app)
+        return app
+
+    def create_photo_task(app, photo, question):
+        # Data for the tasks
+        task_info = dict(question=question,
+                         n_answers=options.n_answers,
+                         link=photo['link'],
+                         url_m=photo['url_m'],
+                         url_b=photo['url_b'])
+        pbclient.create_task(app.id, task_info)
 
     if options.create_app:
         pbclient.create_app(app_config['name'],
                 app_config['short_name'],
                 app_config['description'])
-        app = pbclient.find_app(short_name=app_config['short_name'])[0]
-        app.long_description = open('long_description.html').read()
-        app.info['task_presenter'] = open('template.html').read()
-        app.info['thumbnail'] = app_config['thumbnail']
-        app.info['tutorial'] = open('tutorial.html').read()
+        app = setup_app()
 
-        pbclient.update_app(app)
         # First of all we get the URL photos
-        photos = get_flickr_photos()
-        # Finally, we have to create a set of tasks for the application
+        # Then, we have to create a set of tasks for the application
         # For this, we get first the photo URLs from Flickr
-        for i in xrange(1):
-            for photo in photos:
-                # Data for the tasks
-                task_info = dict(question=app_config['question'],
-                            n_answers=int(options.n_answers), link=photo['link'],
-                            url_m=photo['url_m'],
-                            url_b=photo['url_b'])
-                pbclient.create_task(app.id, task_info)
 
+        photos = get_flickr_photos()
+        question = app_config['question']
+        for i in xrange(1):
+            [ create_photo_task(app, p, question) for p in photos ]
     else:
         if options.add_more_tasks:
-            app = pbclient.find_app(short_name=app_config['short_name'])[0]
+
+            app = find_app_by_short_name()
             photos = get_flickr_photos()
-            for photo in photos:
-                task_info = dict(question="Do you see a human in this photo?",
-                            n_answers=int(options.n_answers), link=photo['link'],
-                            url_m=photo['url_m'],
-                            url_b=photo['url_b'])
-                pbclient.create_task(app.id, task_info)
+            question = "Do you see a human in this photo?"
+            [ create_photo_task(app, p, question) for p in photos ]
 
     if options.update_template:
         print "Updating app template"
-        app = pbclient.find_app(short_name=app_config['short_name'])[0]
-        app.long_description = open('long_description.html').read()
-        app.info['task_presenter'] = open('template.html').read()
-        app.info['tutorial'] = open('tutorial.html').read()
-        app.info['thumbnail'] = app_config['thumbnail']
-        pbclient.update_app(app)
+        setup_app() # discard return value
 
     if options.update_tasks:
         print "Updating task n_answers"
-        app = pbclient.find_app(short_name=app_config['short_name'])[0]
+        app = find_app_by_short_name()
         n_tasks = 0
         offset = 0
         limit = 100
