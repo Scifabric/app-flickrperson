@@ -79,9 +79,8 @@ if __name__ == "__main__":
 
     # Load app details
     try:
-        app_json = file(options.app_config)
-        app_config = json.load(app_json)
-        app_json.close()
+        with file(options.app_config) as app_json:
+            app_config = json.load(app_json)
     except IOError as e:
         print "application config file is missing! Please create a new one"
         exit(1)
