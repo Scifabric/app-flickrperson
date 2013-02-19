@@ -112,6 +112,15 @@ if __name__ == "__main__":
         pbclient.update_app(app)
         return app
 
+    def create_photo_task(app, photo, question):
+        # Data for the tasks
+        task_info = dict(question=question,
+                         n_answers=options.n_answers,
+                         link=photo['link'],
+                         url_m=photo['url_m'],
+                         url_b=photo['url_b'])
+        pbclient.create_task(app.id, task_info)
+
     if options.create_app:
         pbclient.create_app(app_config['name'],
                 app_config['short_name'],
@@ -119,29 +128,20 @@ if __name__ == "__main__":
         app = setup_app()
 
         # First of all we get the URL photos
-        photos = get_flickr_photos()
-        # Finally, we have to create a set of tasks for the application
+        # Then, we have to create a set of tasks for the application
         # For this, we get first the photo URLs from Flickr
-        for i in xrange(1):
-            for photo in photos:
-                # Data for the tasks
-                task_info = dict(question=app_config['question'],
-                            n_answers=options.n_answers, link=photo['link'],
-                            url_m=photo['url_m'],
-                            url_b=photo['url_b'])
-                pbclient.create_task(app.id, task_info)
 
+        photos = get_flickr_photos()
+        question = app_config['question']
+        for i in xrange(1):
+            [ create_photo_task(app, p, question) for p in photos ]
     else:
         if options.add_more_tasks:
 
             app = find_app_by_short_name()
             photos = get_flickr_photos()
-            for photo in photos:
-                task_info = dict(question="Do you see a human in this photo?",
-                            n_answers=options.n_answers, link=photo['link'],
-                            url_m=photo['url_m'],
-                            url_b=photo['url_b'])
-                pbclient.create_task(app.id, task_info)
+            question = "Do you see a human in this photo?"
+            [ create_photo_task(app, p, question) for p in photos ]
 
     if options.update_template:
         print "Updating app template"
