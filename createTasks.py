@@ -122,27 +122,25 @@ if __name__ == "__main__":
                          url_b=photo['url_b'])
         pbclient.create_task(app.id, task_info)
 
+    def add_photo_tasks(app):
+        # First of all we get the URL photos
+        # Then, we have to create a set of tasks for the application
+        # For this, we get first the photo URLs from Flickr
+        photos = get_flickr_photos()
+        question = app_config['question']
+        [create_photo_task(app, p, question) for p in photos]
+
     if options.create_app:
         pbclient.create_app(app_config['name'],
                             app_config['short_name'],
                             app_config['description'])
 
         app = setup_app()
-
-        # First of all we get the URL photos
-        # Then, we have to create a set of tasks for the application
-        # For this, we get first the photo URLs from Flickr
-
-        photos = get_flickr_photos()
-        question = app_config['question']
-        [create_photo_task(app, p, question) for p in photos]
+        add_photo_tasks(app)
     else:
         if options.add_more_tasks:
-
             app = find_app_by_short_name()
-            photos = get_flickr_photos()
-            question = app_config['question']
-            [create_photo_task(app, p, question) for p in photos]
+            add_photo_tasks(app)
 
     if options.update_template:
         print "Updating app template"
