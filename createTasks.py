@@ -102,13 +102,6 @@ def configuration():
     return (app_config, options)
 
 def run(app_config, options):
-    pbclient.set('api_key', options.api_key)
-    pbclient.set('endpoint', options.api_url)
-
-    if options.verbose:
-        print('Running against PyBosssa instance at: %s' % options.api_url)
-        print('Using API-KEY: %s' % options.api_key)
-
     def find_app_by_short_name():
         return pbclient.find_app(short_name=app_config['short_name'])[0]
 
@@ -138,6 +131,13 @@ def run(app_config, options):
         photos = get_flickr_photos()
         question = app_config['question']
         [create_photo_task(app, p, question) for p in photos]
+
+    pbclient.set('api_key', options.api_key)
+    pbclient.set('endpoint', options.api_url)
+
+    if options.verbose:
+        print('Running against PyBosssa instance at: %s' % options.api_url)
+        print('Using API-KEY: %s' % options.api_key)
 
     if options.create_app or options.add_more_tasks:
         if options.create_app:
