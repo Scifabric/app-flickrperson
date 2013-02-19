@@ -81,6 +81,12 @@ if __name__ == "__main__":
             and not options.add_more_tasks and not options.update_tasks:
         parser.error("Please check --help or -h for the available options")
 
+    if not options.api_key:
+        parser.error("You must supply an API-KEY to create an \
+                      applicationa and tasks in PyBossa")
+    else:
+        pbclient.set('api_key', options.api_key)
+
     # Load app details
     try:
         with file(options.app_config) as app_json:
@@ -90,12 +96,6 @@ if __name__ == "__main__":
         exit(1)
 
     pbclient.set('endpoint', options.api_url)
-
-    if not options.api_key:
-        parser.error("You must supply an API-KEY to create an \
-                      applicationa and tasks in PyBossa")
-    else:
-        pbclient.set('api_key', options.api_key)
 
     if options.verbose:
         print('Running against PyBosssa instance at: %s' % options.api_url)
