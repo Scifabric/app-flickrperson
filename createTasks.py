@@ -21,6 +21,8 @@ from optparse import OptionParser
 import pbclient
 from get_images import get_flickr_photos
 
+def contents(filename): return file(filename).read()
+
 if __name__ == "__main__":
     # Arguments for the application
     usage = "usage: %prog [options]"
@@ -102,10 +104,10 @@ if __name__ == "__main__":
                 app_config['short_name'],
                 app_config['description'])
         app = pbclient.find_app(short_name=app_config['short_name'])[0]
-        app.long_description = file('long_description.html').read()
-        app.info['task_presenter'] = file('template.html').read()
+        app.long_description = contents('long_description.html')
+        app.info['task_presenter'] = contents('template.html')
         app.info['thumbnail'] = app_config['thumbnail']
-        app.info['tutorial'] = file('tutorial.html').read()
+        app.info['tutorial'] = contents('tutorial.html')
 
         pbclient.update_app(app)
         # First of all we get the URL photos
@@ -135,9 +137,9 @@ if __name__ == "__main__":
     if options.update_template:
         print "Updating app template"
         app = pbclient.find_app(short_name=app_config['short_name'])[0]
-        app.long_description = file('long_description.html').read()
-        app.info['task_presenter'] = file('template.html').read()
-        app.info['tutorial'] = file('tutorial.html').read()
+        app.long_description = contents('long_description.html')
+        app.info['task_presenter'] = contents('template.html')
+        app.info['tutorial'] = contents('tutorial.html')
         app.info['thumbnail'] = app_config['thumbnail']
         pbclient.update_app(app)
 
