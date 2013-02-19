@@ -84,7 +84,7 @@ if __name__ == "__main__":
         app_json.close()
     except IOError as e:
         print "application config file is missing! Please create a new one"
-        exit(0)
+        exit(1)
 
     pbclient.set('endpoint', options.api_url)
 
