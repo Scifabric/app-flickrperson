@@ -167,22 +167,20 @@ def run(app_config, options):
                     yield task
                 offset += len(tasks)
 
-        def update_task(task):
+        def update_task(task, count):
             print "Updating task: %s" % task.id
             if 'n_answers' in task.info:
                 del(task.info['n_answers'])
             task.n_answers = options.update_tasks
             pbclient.update_task(task)
+            count[0] += 1
 
         print "Updating task n_answers"
         app = find_app_by_short_name()
 
-        n_tasks = 0
-        for t in tasks(app):
-            update_task(t)
-            n_tasks += 1
-
-        print "%s Tasks have been updated!" % n_tasks
+        n_tasks = [0]
+        [update_task(t, n_tasks) for t in tasks(app)]
+        print "%s Tasks have been updated!" % n_tasks[0]
 
 if __name__ == "__main__":
     app_config, options = get_configuration()
