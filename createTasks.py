@@ -158,21 +158,25 @@ def run(app_config, options):
     if options.update_tasks:
         print "Updating task n_answers"
         app = find_app_by_short_name()
-        n_tasks = 0
+        n_tasks = [0]
         offset = 0
         limit = 100
         tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
+
+        def update_task(task):
+            print "Updating task: %s" % task.id
+            if 'n_answers' in task.info:
+                del(task.info['n_answers'])
+            task.n_answers = options.update_tasks
+            pbclient.update_task(task)
+            n_tasks[0] += 1
+
         while tasks:
             for task in tasks:
-                print "Updating task: %s" % task.id
-                if 'n_answers' in task.info:
-                    del(task.info['n_answers'])
-                task.n_answers = options.update_tasks
-                pbclient.update_task(task)
-                n_tasks += 1
+                update_task(task)
             offset = (offset + limit)
             tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
-        print "%s Tasks have been updated!" % n_tasks
+        print "%s Tasks have been updated!" % n_tasks[0]
 
 if __name__ == "__main__":
     app_config, options = get_configuration()
