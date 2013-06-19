@@ -25,6 +25,7 @@ from get_images import get_flickr_photos
 def contents(filename):
     return file(filename).read()
 
+
 def handle_arguments():
     # Arguments for the application
     usage = "usage: %prog [options]"
@@ -88,6 +89,7 @@ def handle_arguments():
 
     return options
 
+
 def get_configuration():
     options = handle_arguments()
 
@@ -95,11 +97,12 @@ def get_configuration():
     try:
         with file(options.app_config) as app_json:
             app_config = json.load(app_json)
-    except IOError as e:
+    except IOError:
         print "application config file is missing! Please create a new one"
         exit(1)
 
     return (app_config, options)
+
 
 def run(app_config, options):
     def find_app_by_short_name():
@@ -156,7 +159,7 @@ def run(app_config, options):
         setup_app()
 
     if options.update_tasks:
-        def tasks(app): 
+        def tasks(app):
             offset = 0
             limit = 100
             while True:
