@@ -29,3 +29,6 @@ http://docs.pybossa.com/en/latest/user/create-application-tutorial.html
 The thumbnail has been created using a photo from Sean McGrath (license CC
 BY 2.0). 
 Check the original photo here: http://www.flickr.com/photos/mcgraths/3289448299/
+
+
+**Note**: You can see the results of the CrowdCrafting app [here](http://dev.pybossa.com/app-flickrperson/results.html)
