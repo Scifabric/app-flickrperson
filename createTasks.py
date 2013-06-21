@@ -20,6 +20,7 @@ import json
 from optparse import OptionParser
 import pbclient
 from get_images import get_flickr_photos
+import random
 
 
 def contents(filename):
@@ -118,14 +119,14 @@ def run(app_config, options):
         pbclient.update_app(app)
         return app
 
-    def create_photo_task(app, photo, question):
+    def create_photo_task(app, photo, question, priority=0):
         # Data for the tasks
         task_info = dict(question=question,
                          n_answers=options.n_answers,
                          link=photo['link'],
                          url_m=photo['url_m'],
                          url_b=photo['url_b'])
-        pbclient.create_task(app.id, task_info)
+        pbclient.create_task(app.id, task_info, priority_0=priority)
 
     def add_photo_tasks(app):
         # First of all we get the URL photos
@@ -133,7 +134,7 @@ def run(app_config, options):
         # For this, we get first the photo URLs from Flickr
         photos = get_flickr_photos()
         question = app_config['question']
-        [create_photo_task(app, p, question) for p in photos]
+        [create_photo_task(app, p, question, priority=random.random()) for p in photos]
 
     pbclient.set('api_key', options.api_key)
     pbclient.set('endpoint', options.api_url)
