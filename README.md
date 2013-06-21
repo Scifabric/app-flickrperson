@@ -5,7 +5,7 @@ This application has three files:
 
 *  createTasks.py: for creating the application in PyBossa, and fill it with some tasks.
 *  template.html: the view for every task and deal with the data of the answers.
-*  tutorial.html: a sample tutorial that will be shown for the users.
+*  tutorial.html: a simple tutorial for the volunteers.
 
 Testing the application
 =======================
@@ -22,13 +22,23 @@ Then, you can follow the next steps:
 *  Run python createTasks.py -u http://crowdcrafting.org -k API-KEY
 *  Open with your browser the Applications section and choose the FlickrPerson app. This will open the presenter for this demo application.
 
-Please, check the full documentation here:
+Documentation
+=============
 
-http://docs.pybossa.com/en/latest/user/create-application-tutorial.html
+We recommend that you read the section: [Build with PyBossa](http://docs.pybossa.com/en/latest/build_with_pybossa.html) and follow the [step by step tutorial](http://docs.pybossa.com/en/latest/user/tutorial.html).
 
-The thumbnail has been created using a photo from Sean McGrath (license CC
-BY 2.0). 
-Check the original photo here: http://www.flickr.com/photos/mcgraths/3289448299/
+**NOTE**: This application usses the [pybossa-client](https://pypi.python.org/pypi/pybossa-client) in order to simplify the development of the application and its usage. Check the [documentation](http://pythonhosted.org/pybossa-client/).
+
+
+LICENSE
+=======
+
+Please, see the COPYING file.
+
+
+Acknowledgments
+===============
+The thumbnail has been created using a [photo](http://www.flickr.com/photos/mcgraths/3289448299/) from Sean McGrath (license CC BY 2.0). 
 
 
 **Note**: You can see the results of the CrowdCrafting app [here](http://dev.pybossa.com/app-flickrperson/results.html)
