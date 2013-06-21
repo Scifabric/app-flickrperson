@@ -7,6 +7,8 @@ This application has three files:
 *  template.html: the view for every task and deal with the data of the answers.
 *  tutorial.html: a simple tutorial for the volunteers.
 
+![alt screenshot](http://i.imgur.com/63SmFEu.png)
+
 Testing the application
 =======================
 
