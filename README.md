@@ -1,9 +1,11 @@
 PyBossa demo application Flickr Person
+======================================
 
 This application has three files:
 
 *  createTasks.py: for creating the application in PyBossa, and fill it with some tasks.
 *  template.html: the view for every task and deal with the data of the answers.
+*  tutorial.html: a sample tutorial that will be shown for the users.
 
 Testing the application
 =======================
