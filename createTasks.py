@@ -108,17 +108,22 @@ def get_configuration():
 
 
 def run(app_config, options):
+    def check_api_error(api_response):
+        """Check if returned API response contains an error"""
+        if type(api_response) == dict and (api_response.get('status') == 'failed'):
+            raise exceptions.HTTPError
+
     def format_error(module, error):
         """Format the error for the given module"""
         logging.error(module)
         # Beautify JSON error
         print json.dumps(error, sort_keys=True, indent=4, separators=(',', ': '))
+        exit(1)
 
     def find_app_by_short_name():
         try:
-            response = pbclient.find_app(shor_name=app_config['short_name'])
-            if type(response) == dict and (response.get('status') == 'failed'):
-                raise exceptions.HTTPError
+            response = pbclient.find_app(short_name=app_config['short_name'])
+            check_api_error(response)
             return response[0]
         except:
             format_error("pbclient.find_app", response)
@@ -130,8 +135,12 @@ def run(app_config, options):
         app.info['thumbnail'] = app_config['thumbnail']
         app.info['tutorial'] = contents('tutorial.html')
 
-        pbclient.update_app(app)
-        return app
+        try:
+            response = pbclient.update_app(app)
+            check_api_error(response)
+            return app
+        except:
+            format_error("pbclient.update_app", response)
 
     def create_photo_task(app, photo, question, priority=0):
         # Data for the tasks
