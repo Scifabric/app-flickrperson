@@ -21,6 +21,8 @@ from optparse import OptionParser
 import pbclient
 from get_images import get_flickr_photos
 import random
+import logging
+from requests import exceptions
 
 
 def contents(filename):
@@ -106,8 +108,20 @@ def get_configuration():
 
 
 def run(app_config, options):
+    def format_error(module, error):
+        """Format the error for the given module"""
+        logging.error(module)
+        # Beautify JSON error
+        print json.dumps(error, sort_keys=True, indent=4, separators=(',', ': '))
+
     def find_app_by_short_name():
-        return pbclient.find_app(short_name=app_config['short_name'])[0]
+        try:
+            response = pbclient.find_app(shor_name=app_config['short_name'])
+            if type(response) == dict and (response.get('status') == 'failed'):
+                raise exceptions.HTTPError
+            return response[0]
+        except:
+            format_error("pbclient.find_app", response)
 
     def setup_app():
         app = find_app_by_short_name()
