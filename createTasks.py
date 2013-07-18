@@ -149,7 +149,11 @@ def run(app_config, options):
                          link=photo['link'],
                          url_m=photo['url_m'],
                          url_b=photo['url_b'])
-        pbclient.create_task(app.id, task_info, priority_0=priority)
+        try:
+            response = pbclient.create_task(app.id, task_info, priority_0=priority)
+            check_api_error(response)
+        except:
+            format_error("pbclient.create_task", response)
 
     def add_photo_tasks(app):
         # First of all we get the URL photos
