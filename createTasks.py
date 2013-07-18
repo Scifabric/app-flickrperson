@@ -172,11 +172,15 @@ def run(app_config, options):
 
     if options.create_app or options.add_more_tasks:
         if options.create_app:
-            pbclient.create_app(app_config['name'],
-                                app_config['short_name'],
-                                app_config['description'])
+            try:
+                response = pbclient.create_app(app_config['name'],
+                                               app_config['short_name'],
+                                               app_config['description'])
 
-            app = setup_app()
+                check_api_error(response)
+                app = setup_app()
+            except:
+                format_error("pbclient.create_app", response)
         else:
             app = find_app_by_short_name()
         add_photo_tasks(app)
