@@ -117,7 +117,10 @@ def run(app_config, options):
         """Format the error for the given module"""
         logging.error(module)
         # Beautify JSON error
-        print json.dumps(error, sort_keys=True, indent=4, separators=(',', ': '))
+        if type(error) == list:
+            print "Application not found"
+        else:
+            print json.dumps(error, sort_keys=True, indent=4, separators=(',', ': '))
         exit(1)
 
     def find_app_by_short_name():
@@ -195,20 +198,28 @@ def run(app_config, options):
             offset = 0
             limit = 100
             while True:
-                tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
-                if len(tasks) == 0:
-                    break
-                for task in tasks:
-                    yield task
-                offset += len(tasks)
+                try:
+                    tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
+                    check_api_error(tasks)
+                    if len(tasks) == 0:
+                        break
+                    for task in tasks:
+                        yield task
+                    offset += len(tasks)
+                except:
+                    format_error("pbclient.get_tasks", response)
 
         def update_task(task, count):
             print "Updating task: %s" % task.id
             if 'n_answers' in task.info:
                 del(task.info['n_answers'])
             task.n_answers = options.update_tasks
-            pbclient.update_task(task)
-            count[0] += 1
+            try:
+                response = pbclient.update_task(task)
+                check_api_error(response)
+                count[0] += 1
+            except:
+                format_error("pbclient.update_task", response)
 
         print "Updating task n_answers"
         app = find_app_by_short_name()
