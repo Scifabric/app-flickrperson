@@ -35,8 +35,8 @@ def handle_arguments():
     parser = OptionParser(usage)
     # URL where PyBossa listens
     parser.add_option("-s", "--server", dest="api_url",
-                      help="PyBossa URL http://domain.com/", metavar="URL",
-                      default="http://localhost:5000/")
+                      help="PyBossa URL http://domain.com", metavar="URL",
+                      default="http://localhost:5000")
     # API-KEY
     parser.add_option("-k", "--api-key", dest="api_key",
                       help="PyBossa User API-KEY to interact with PyBossa",
