@@ -114,7 +114,7 @@ pybossa.taskLoaded(function(task, deferred) {
             deferred.resolve(task);
         });
         img.attr('src', task.info.url_b).css('height', 460);
-        img.addClass('img-thumbnail');
+        img.addClass('img-thumbnail img-responsive');
         task.info.image = img;
     }
     else {
