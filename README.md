@@ -19,9 +19,11 @@ You need to install the pybossa-client first (use a virtualenv):
 ```
 Then, you can follow the next steps:
 
-*  Create an account in PyBossa
+*  Create an account on crowdcrafting.org
 *  Copy under your account profile your API-KEY
-*  Run python createTasks.py -u http://crowdcrafting.org -k API-KEY
+*  Open app.json and change "name" and "short_name" to something else that is unique
+*  Open template.html and replace 'airquality' with the short_name of your own app (2 occurrences)
+*  Run python createTasks.py -s http://crowdcrafting.org -k API-KEY -c
 *  Open with your browser the Applications section and choose the FlickrPerson app. This will open the presenter for this demo application.
 
 Documentation
