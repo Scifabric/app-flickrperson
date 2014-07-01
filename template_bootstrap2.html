@@ -1,6 +1,6 @@
 <div class="row">
     <!-- Success and Error Messages for the user --> 
-    <div class="col-md-6 col-md-offset-2" style="height:50px">
+    <div class="span6 offset2" style="height:50px">
         <div id="success" class="alert alert-success" style="display:none;">
             <a class="close">×</a>
             <strong>Well done!</strong> Your answer has been saved
@@ -17,10 +17,10 @@
             <br/>
             <div class="alert-actions">
                 <a class="btn small" href="/">Go back</a>
-                <a class="btn small" href="/app">or, Check other projects</a>
+                <a class="btn small" href="/app">or, Check other applications</a>
             </div>
         </div>
-        <div id="error" class="alert alert-danger" style="display:none;">
+        <div id="error" class="alert alert-error" style="display:none;">
             <a class="close">×</a>
             <strong>Error!</strong> Something went wrong, please contact the site administrators
         </div>
@@ -33,25 +33,25 @@
     task.
 -->
 <div class="row skeleton"> <!-- Start Skeleton Row-->
-    <div class="col-md-6 "><!-- Start of Question and Submission DIV (column) -->
+    <div class="span6 "><!-- Start of Question and Submission DIV (column) -->
         <h1 id="question">Question</h1> <!-- The question will be loaded here -->
         <div id="answer"> <!-- Start DIV for the submission buttons -->
             <!-- If the user clicks this button, the saved answer will be value="yes"-->
-            <button class="btn btn-success btn-answer" value='Yes'><i class="fa fa-thumbs-o-up"></i> Yes</button>
+            <button class="btn btn-success btn-answer" value='Yes'><i class="icon icon-white icon-thumbs-up"></i> Yes</button>
             <!-- If the user clicks this button, the saved answer will be value="no"-->
-            <button class="btn btn-danger btn-answer" value='No'><i class="fa fa-thumbs-o-down"></i> No</button>
+            <button class="btn btn-danger btn-answer" value='No'><i class="icon icon-white icon-thumbs-down"></i> No</button>
             <!-- If the user clicks this button, the saved answer will be value="NoPhoto"-->
-            <button class="btn btn-answer" value='NoPhoto'><i class="fa fa-exclamation"></i> No photo</button>
+            <button class="btn btn-answer" value='NoPhoto'><i class="icon icon-white icon-exclamation"></i> No photo</button>
             <!-- If the user clicks this button, the saved answer will be value="NotKnown"-->
-            <button class="btn btn-answer" value='NotKnown'><i class="fa fa-question-circle"></i> I don't know</button>
+            <button class="btn btn-answer" value='NotKnown'><i class="icon icon-white icon-question-sign"></i> I don't know</button>
         </div><!-- End of DIV for the submission buttons -->
         <!-- Feedback items for the user -->
         <p>You are working now on task: <span id="task-id" class="label label-warning">#</span></p>
         <p>You have completed: <span id="done" class="label label-info"></span> tasks from
         <!-- Progress bar for the user -->
-        <span id="total" class="label label-info"></span></p>
+        <span id="total" class="label label-inverse"></span></p>
         <div class="progress progress-striped">
-            <div id="progress" rel="tooltip" title="#" class="progress-bar" style="width: 0%;"  role="progressbar"></div>
+            <div id="progress" rel="tooltip" title="#" class="bar" style="width: 0%;"></div>
         </div>
         <!-- 
             This application uses Disqus to allow users to provide some feedback.
@@ -59,13 +59,13 @@
             load the comments, if any, for the given task
         -->
         <div id="disqus_show_btn" style="margin-top:5px;">
-            <button class="btn btn-primary btn-large btn-disqus" onclick="loadDisqus()"><i class="fa fa-comments"></i> Show comments</button>
-            <button class="btn btn-large btn-disqus" onclick="loadDisqus()" style="display:none"><i class="fa fa-comments"></i> Hide comments</button>
+            <button class="btn btn-primary btn-large btn-disqus" onclick="loadDisqus()"><i class="icon-comments"></i> Show comments</button>
+            <button class="btn btn-large btn-disqus" onclick="loadDisqus()" style="display:none"><i class="icon-comments"></i> Hide comments</button>
         </div><!-- End of Disqus Button section -->
         <!-- Disqus thread for the given task -->
         <div id="disqus_thread" style="margin-top:5px;display:none"></div>
     </div><!-- End of Question and Submission DIV (column) -->
-    <div class="col-md-6"><!-- Start of Photo DIV (column) -->
+    <div class="span6"><!-- Start of Photo DIV (column) -->
         <a id="photo-link" href="#">
             <img id="photo" src="http://i.imgur.com/GeHxzb7.png" style="max-width=100%">
         </a>
@@ -114,7 +114,7 @@ pybossa.taskLoaded(function(task, deferred) {
             deferred.resolve(task);
         });
         img.attr('src', task.info.url_b).css('height', 460);
-        img.addClass('img-thumbnail img-responsive');
+        img.addClass('img-polaroid');
         task.info.image = img;
     }
     else {
