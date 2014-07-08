@@ -59,3 +59,9 @@ def get_flickr_photos(size="big"):
         photos.append({'link': photo["link"], 'url_m':  imgUrl_m,
                        'url_b': imgUrl_b})
     return photos
+
+if __name__ == '__main__':
+    file = open('flickr_tasks.json', 'w')
+    photos = get_flickr_photos()
+    file.write(json.dumps(photos))
+    file.close()
