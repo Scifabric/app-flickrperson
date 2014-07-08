@@ -1,16 +1,16 @@
-PyBossa demo application Flickr Person
+PyBossa demo project Flickr Person
 ======================================
 
-This application has three files:
+This project has three main files:
 
-*  createTasks.py: for creating the application in PyBossa, and fill it with some tasks.
+*  createTasks.py: for creating the project in PyBossa, and fill it with some tasks.
 *  template.html: the view for every task and deal with the data of the answers.
 *  tutorial.html: a simple tutorial for the volunteers.
 
-![alt screenshot](http://i.imgur.com/63SmFEu.png)
+![alt screenshot](http://i.imgur.com/Isj4rJQ.png)
 
-Testing the application
-=======================
+Testing the project
+===================
 
 You need to install the pybossa-client first (use a virtualenv):
 
@@ -19,17 +19,17 @@ You need to install the pybossa-client first (use a virtualenv):
 ```
 Then, you can follow the next steps:
 
-*  Create an account in PyBossa
-*  Copy under your account profile your API-KEY
+*  Create an account in your PyBossa server (use [Crowdcrafting](http://crowdcrafting.org) if you want).
+*  Copy your API-KEY (you can find it in your profile page).
 *  Run python createTasks.py -u http://crowdcrafting.org -k API-KEY
-*  Open with your browser the Applications section and choose the FlickrPerson app. This will open the presenter for this demo application.
+*  Open with your browser the Projects section and choose the FlickrPerson project. This will open the presenter for this demo project.
 
 Documentation
 =============
 
 We recommend that you read the section: [Build with PyBossa](http://docs.pybossa.com/en/latest/build_with_pybossa.html) and follow the [step by step tutorial](http://docs.pybossa.com/en/latest/user/tutorial.html).
 
-**NOTE**: This application uses the [pybossa-client](https://pypi.python.org/pypi/pybossa-client) in order to simplify the development of the application and its usage. Check the [documentation](http://pythonhosted.org/pybossa-client/).
+**NOTE**: This project uses the [pybossa-client](https://pypi.python.org/pypi/pybossa-client) in order to simplify the development of the application and its usage. Check the [documentation](http://pythonhosted.org/pybossa-client/).
 
 
 LICENSE
@@ -43,4 +43,4 @@ Acknowledgments
 The thumbnail has been created using a [photo](http://www.flickr.com/photos/mcgraths/3289448299/) from Sean McGrath (license CC BY 2.0). 
 
 
-**Note**: You can see the results of the CrowdCrafting app [here](http://dev.pybossa.com/app-flickrperson/results.html)
+**Note**: You can see the results of the Crowdcrafting app [here](http://dev.pybossa.com/app-flickrperson/results.html)
