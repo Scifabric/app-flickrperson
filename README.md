@@ -93,7 +93,7 @@ Now we can add some tasks. The project comes with two samples that you can use:
 This is very simple too, thanks to pbs:
 
 ```bash
-    $ pbs add_tasks --tasks-file flickr_tasks.csv --tasks-type=csv
+    $ pbs add_tasks --tasks-file flickr_tasks.csv
 ```
 You'll get a progress bar with the tasks being uploaded. Now your project has
 some tasks in the server to be processed by the volunteers.
@@ -112,7 +112,7 @@ our project:
 
 ```bash
     $ python get_images.py
-    $ pbs add_tasks --tasks-file flickr_tasks.json --tasks-type=json
+    $ pbs add_tasks --tasks-file flickr_tasks.json
 ```
 
 Again, as before, you will see a progess bar as the tasks are being added to
