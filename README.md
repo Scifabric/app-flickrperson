@@ -62,7 +62,7 @@ config file. For creating the file, follow the next steps:
 
 That will create a file. Now paste the following:
 
-```python
+```ini
 [default]
 server: http://yourpybossaserver.com
 apikey: yourapikey
@@ -93,7 +93,7 @@ Now we can add some tasks. The project comes with two samples that you can use:
 This is very simple too, thanks to pbs:
 
 ```bash
-    $ pbs add_tasks --tasks-file flickr_tasks.csv --tasks-type=csv
+    $ pbs add_tasks --tasks-file flickr_tasks.csv
 ```
 You'll get a progress bar with the tasks being uploaded. Now your project has
 some tasks in the server to be processed by the volunteers.
@@ -112,7 +112,7 @@ our project:
 
 ```bash
     $ python get_images.py
-    $ pbs add_tasks --tasks-file flickr_tasks.json --tasks-type=json
+    $ pbs add_tasks --tasks-file flickr_tasks.json
 ```
 
 Again, as before, you will see a progess bar as the tasks are being added to
@@ -138,7 +138,7 @@ Documentation
 
 We recommend that you read the section: [Build with PyBossa](http://docs.pybossa.com/en/latest/build_with_pybossa.html), follow the [step by step tutorial](http://docs.pybossa.com/en/latest/user/tutorial.html) and read the [PyBossa pbs documentation](https://github.com/PyBossa/pbs).
 
-**NOTE**: This project uses the [pybossa-client](https://pypi.python.org/pypi/pybossa-client) in order to simplify the development of the application and its usage. Check the [documentation](http://pythonhosted.org/pybossa-client/).
+**NOTE**: This project uses the [pybossa-pbs](https://pypi.python.org/pypi/pybossa-pbs) library in order to simplify the development of the project and its usage. Check the [documentation](https://github.com/PyBossa/pbs).
 
 
 LICENSE
