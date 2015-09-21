@@ -41,6 +41,8 @@ Or if you prefer:
     $ pip install -r requirements.txt
 ```
 
+**NOTE**: Use this template with a PyBossa server version >=1.0.0.
+
 ## Creating an account in a PyBossa server
 Now that you've all the requirements installed in your system, you need
 a PyBossa account:
