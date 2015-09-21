@@ -144,6 +144,8 @@ We recommend that you read the section: [Build with PyBossa](http://docs.pybossa
 LICENSE
 =======
 
+Copyright (C) 2015 [SciFabric LTD](http://scifabric.com)
+
 Please, see the COPYING file.
 
 
